@@ -1,5 +1,6 @@
 package org.geo7.rest;
 
+import jakarta.validation.Valid;
 import org.geo7.model.entity.Lote;
 import org.geo7.model.repository.LoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,8 @@ public class LoteController {
     }
 
     @PostMapping
-    public ResponseEntity<Lote> salvar(@RequestBody Lote lote) {
-        Lote salvo = loteRepository.save(lote);
-        return ResponseEntity.ok(salvo);
+    public ResponseEntity<Lote> salvar(@Valid @RequestBody Lote lote) {
+        return ResponseEntity.ok(loteRepository.save(lote));
     }
 
     @GetMapping("{id}")

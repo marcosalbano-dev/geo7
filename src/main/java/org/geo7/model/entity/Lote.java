@@ -3,7 +3,10 @@ package org.geo7.model.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.validator.constraints.br.CPF;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -24,6 +27,7 @@ public class Lote implements Serializable {
     private Long id;
 
     @Column(nullable = false, length = 150)
+    @NotEmpty(message = "{campo.proprietario.obrigatorio}")
     private String proprietario;
 
     @Column(precision = 18, scale = 4)
@@ -31,8 +35,6 @@ public class Lote implements Serializable {
 
     @Column
     private String denominacaoImovel;
-
-
 
     @Column(nullable = false, length = 50)
     private String numero;
@@ -50,6 +52,8 @@ public class Lote implements Serializable {
     private String sncr;
 
     @Column(nullable = false, length = 11)
+    @NotNull(message = "{campo.cpf.obrigatorio}")
+    @CPF(message = "{campo.cpf.invalido}")
     private String cpf;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
