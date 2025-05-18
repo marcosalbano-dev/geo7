@@ -17,7 +17,7 @@ public class DistritoController {
 
     @Autowired
     private DistritoRepository distritoRepository;
-    public DistritoController(final DistritoRepository distritoRepository) {
+    public DistritoController(DistritoRepository distritoRepository) {
         this.distritoRepository = distritoRepository;
     }
 
