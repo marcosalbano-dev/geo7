@@ -26,7 +26,6 @@ public class Distrito implements Serializable {
 
     @Column(nullable = false, length = 100)
     private String nomeDistrito;
-
     @Override
     public String toString() {
         return nomeDistrito;

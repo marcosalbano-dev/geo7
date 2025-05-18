@@ -42,6 +42,7 @@ public class LoteController {
                 .orElse(ResponseEntity.notFound().build());
 
     }
+
     @PutMapping("{id}")
     public ResponseEntity<Lote> atualizar(@PathVariable Long id, @RequestBody Lote loteAtualizado) {
         return loteRepository.findById(id)
