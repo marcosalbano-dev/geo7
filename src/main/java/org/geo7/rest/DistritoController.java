@@ -45,7 +45,7 @@ public class DistritoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Distrito> atualizar(@PathVariable Long id, @RequestBody Distrito distritoAtualizado) {
+    public ResponseEntity<Distrito> atualizar(@Valid @PathVariable Long id, @RequestBody Distrito distritoAtualizado) {
         return distritoRepository.findById(id)
                 .map(distrito -> {
                     distrito.setCodigoDistrito(distritoAtualizado.getCodigoDistrito());

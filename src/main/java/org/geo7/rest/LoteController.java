@@ -44,7 +44,7 @@ public class LoteController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Lote> atualizar(@PathVariable Long id, @RequestBody Lote loteAtualizado) {
+    public ResponseEntity<Lote> atualizar(@Valid @PathVariable Long id, @RequestBody Lote loteAtualizado) {
         return loteRepository.findById(id)
                 .map(lote -> {
                     lote.setSncr(loteAtualizado.getSncr());

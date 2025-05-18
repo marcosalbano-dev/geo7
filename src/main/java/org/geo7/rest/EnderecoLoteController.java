@@ -46,7 +46,7 @@ public class EnderecoLoteController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<EnderecoLote> atualizar(@PathVariable Long id, @RequestBody EnderecoLote enderecoLoteAtualizado) {
+    public ResponseEntity<EnderecoLote> atualizar(@Valid @PathVariable Long id, @RequestBody EnderecoLote enderecoLoteAtualizado) {
         return enderecoLoteRepository.findById(id)
                 .map(enderecoLote -> {
                     enderecoLote.setPontoDeReferencia(enderecoLoteAtualizado.getPontoDeReferencia());

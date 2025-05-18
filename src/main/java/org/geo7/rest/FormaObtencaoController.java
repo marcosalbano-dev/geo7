@@ -46,7 +46,7 @@ public class FormaObtencaoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<FormaObtencao> atualizar(@PathVariable Long id, @RequestBody FormaObtencao formaObtencaoAtualizada) {
+    public ResponseEntity<FormaObtencao> atualizar(@Valid @PathVariable Long id, @RequestBody FormaObtencao formaObtencaoAtualizada) {
         return formaObtencaoRepository.findById(id)
                 .map(formaObtencao -> {
                     formaObtencao.setDescricaoFormaDeObtencao(formaObtencaoAtualizada.getDescricaoFormaDeObtencao());
@@ -58,4 +58,5 @@ public class FormaObtencaoController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
 }

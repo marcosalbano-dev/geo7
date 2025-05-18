@@ -31,7 +31,7 @@ public class EstruturaController {
     public ResponseEntity<Estrutura> buscarPorId(@PathVariable Long id) {
         return estruturaRepository.findById(id)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Estrutura não encontrada"));
     }
 
     @DeleteMapping("{id}")
@@ -46,7 +46,7 @@ public class EstruturaController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Estrutura> atualizar(@PathVariable Long id, @RequestBody Estrutura estruturaAtualizada) {
+    public ResponseEntity<Estrutura> atualizar(@Valid @PathVariable Long id, @RequestBody Estrutura estruturaAtualizada) {
         return estruturaRepository.findById(id)
                 .map(estrutura -> {
                     estrutura.setPontoDeReferencia(estruturaAtualizada.getPontoDeReferencia());
