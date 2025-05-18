@@ -1,8 +1,11 @@
 package org.geo7.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
@@ -13,8 +16,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Lote {
+public class Lote implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lotes_seq")
@@ -30,9 +32,7 @@ public class Lote {
     @Column
     private String denominacaoImovel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "situacao_juridica_id")
-    private SituacaoJuridica situacaoJuridica;
+
 
     @Column(nullable = false, length = 50)
     private String numero;
@@ -52,10 +52,20 @@ public class Lote {
     @Column(nullable = false, length = 11)
     private String cpf;
 
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "municipio_id", nullable = false)
+    @JoinColumn(name = "municipio_id", nullable = false, referencedColumnName = "id")
     private Municipio municipio;
+
+    @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<FormaObtencao> formaObtencao = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "situacao_juridica_id")
+    private SituacaoJuridica situacaoJuridica;
+
+    @Column
+    private String dataTerminoPeriodoDeUso;
 
 
 //
@@ -67,13 +77,20 @@ public class Lote {
 //    @JoinColumn(name = "modificado_por_id")
 //    private SecUser modificadoPor;
 //
-//    @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<FormaObtencao> formaObtencao = new HashSet<>();
+
 
 
     @Override
     public String toString() {
-        return numero;
+        return "Lote{" +
+                "id=" + id +
+                ", proprietario='" + proprietario + '\'' +
+                ", numero='" + numero + '\'' +
+                ", area=" + area +
+                ", perimetro=" + perimetro +
+                ", cpf='" + cpf + '\'' +
+                ", municipio=" + (municipio != null ? municipio.getNome() : "N/A") +
+                '}';
     }
 
 }

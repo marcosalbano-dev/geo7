@@ -1,17 +1,21 @@
 package org.geo7.model.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
 
 @Entity
 @Table(name = "situacoes_juridicas", schema = "geo7")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class SituacaoJuridica {
+public class SituacaoJuridica implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "situacoes_juridicas_seq")
@@ -22,6 +26,7 @@ public class SituacaoJuridica {
     private String nome;
 
     @OneToMany(mappedBy = "situacaoJuridica", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Lote> lotes = new HashSet<>();
 
     @Override

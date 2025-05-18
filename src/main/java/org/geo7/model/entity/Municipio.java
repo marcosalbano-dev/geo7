@@ -1,8 +1,10 @@
 package org.geo7.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 @Entity
@@ -10,8 +12,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Municipio {
+public class Municipio implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "municipios_seq")
@@ -41,6 +42,7 @@ public class Municipio {
     private String mesoregiao;
 
     @OneToMany(mappedBy = "municipio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Lote> lotes = new HashSet<>();
 
     // Conversão do método setNome para transformar em maiúsculo automaticamente
@@ -50,7 +52,11 @@ public class Municipio {
 
     @Override
     public String toString() {
-        return nome + " - [ " + id + " ]";
+        return "Municipio{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", uf='" + uf + '\'' +
+                '}';
     }
 
     @Override
