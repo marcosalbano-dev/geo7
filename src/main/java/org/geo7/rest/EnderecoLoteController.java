@@ -5,6 +5,7 @@ import org.geo7.model.entity.EnderecoLote;
 import org.geo7.model.entity.Lote;
 import org.geo7.model.repository.EnderecoLoteRepository;
 import org.geo7.model.repository.LoteRepository;
+import org.geo7.rest.dto.EnderecoLoteDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,45 +19,39 @@ public class EnderecoLoteController {
     @Autowired
     private EnderecoLoteRepository enderecoLoteRepository;
 
-    public EnderecoLoteController(EnderecoLoteRepository enderecoLoteRepository) {
-        this.enderecoLoteRepository = enderecoLoteRepository;
+    @GetMapping("/{id}")
+    public ResponseEntity<EnderecoLoteDTO> getById(@PathVariable Long id) {
+        return enderecoLoteRepository.findById(id)
+                .map(EnderecoLoteDTO::fromEntity)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<EnderecoLote> salvar(@Valid @RequestBody EnderecoLote enderecoLote) {
-        return ResponseEntity.ok(enderecoLoteRepository.save(enderecoLote));
+    public ResponseEntity<EnderecoLoteDTO> create(@RequestBody EnderecoLoteDTO dto) {
+        EnderecoLote enderecoLote = dto.toEntity();
+        EnderecoLote saved = enderecoLoteRepository.save(enderecoLote);
+        return ResponseEntity.ok(EnderecoLoteDTO.fromEntity(saved));
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<EnderecoLote> buscarPorId(@PathVariable Long id) {
-        return enderecoLoteRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "EnderecoLote não encontrado"));
+    @PutMapping("/{id}")
+    public ResponseEntity<EnderecoLoteDTO> update(@PathVariable Long id, @RequestBody EnderecoLoteDTO dto) {
+        if (!enderecoLoteRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        EnderecoLote enderecoLote = dto.toEntity();
+        enderecoLote.setId(id); // Garante que o ID seja o mesmo do path
+        EnderecoLote saved = enderecoLoteRepository.save(enderecoLote);
+        return ResponseEntity.ok(EnderecoLoteDTO.fromEntity(saved));
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Object> deletar(@PathVariable Long id) {
-        return enderecoLoteRepository.findById(id)
-                .map(enderecoLote -> {
-                    enderecoLoteRepository.delete(enderecoLote);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
-
-    }
-
-    @PutMapping("{id}")
-    public ResponseEntity<EnderecoLote> atualizar(@Valid @PathVariable Long id, @RequestBody EnderecoLote enderecoLoteAtualizado) {
-        return enderecoLoteRepository.findById(id)
-                .map(enderecoLote -> {
-                    enderecoLote.setPontoDeReferencia(enderecoLoteAtualizado.getPontoDeReferencia());
-                    enderecoLote.setDistrito(enderecoLoteAtualizado.getDistrito());
-                    enderecoLote.setLote(enderecoLoteAtualizado.getLote());
-                    enderecoLote.setComunidade(enderecoLoteAtualizado.getComunidade());
-                    enderecoLote.setLocalidade(enderecoLoteAtualizado.getLocalidade());
-                    enderecoLoteRepository.save(enderecoLote);
-                    return ResponseEntity.ok(enderecoLote);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (enderecoLoteRepository.existsById(id)) {
+            enderecoLoteRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

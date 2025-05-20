@@ -5,56 +5,75 @@ import org.geo7.model.entity.Distrito;
 import org.geo7.model.entity.Lote;
 import org.geo7.model.repository.DistritoRepository;
 import org.geo7.model.repository.LoteRepository;
+import org.geo7.model.repository.MunicipioRepository;
+import org.geo7.rest.dto.DistritoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/disritos")
 public class DistritoController {
 
-    @Autowired
-    private DistritoRepository distritoRepository;
-    public DistritoController(DistritoRepository distritoRepository) {
+    private final DistritoRepository distritoRepository;
+    private final MunicipioRepository municipioRepository;
+
+    public DistritoController(DistritoRepository distritoRepository, MunicipioRepository municipioRepository) {
         this.distritoRepository = distritoRepository;
+        this.municipioRepository = municipioRepository;
     }
 
     @PostMapping
-    public ResponseEntity<Distrito> salvar(@Valid @RequestBody Distrito distrito) {
-        return ResponseEntity.ok(distritoRepository.save(distrito));
+    public ResponseEntity<DistritoDTO> salvar(@Valid @RequestBody DistritoDTO dto) {
+        var municipio = municipioRepository.findById(dto.municipioId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Município não encontrado"));
+
+        Distrito salvo = distritoRepository.save(dto.toEntity(municipio));
+        return ResponseEntity.ok(DistritoDTO.fromEntity(salvo));
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Distrito> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<DistritoDTO> buscarPorId(@PathVariable Long id) {
         return distritoRepository.findById(id)
+                .map(DistritoDTO::fromEntity)
                 .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Distrito não encontrado"));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<DistritoDTO>> listarTodos() {
+        var distritos = distritoRepository.findAll().stream()
+                .map(DistritoDTO::fromEntity)
+                .toList();
+        return ResponseEntity.ok(distritos);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<DistritoDTO> atualizar(@PathVariable Long id, @RequestBody @Valid DistritoDTO dto) {
+        return distritoRepository.findById(id)
+                .map(d -> {
+                    var municipio = municipioRepository.findById(dto.municipioId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Município não encontrado"));
+
+                    d.setCodigoDistrito(dto.codigoDistrito());
+                    d.setNomeDistrito(dto.nomeDistrito());
+                    d.setMunicipio(municipio);
+                    return ResponseEntity.ok(DistritoDTO.fromEntity(distritoRepository.save(d)));
+                })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Distrito não encontrado"));
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deletar(@PathVariable Long id) {
         return distritoRepository.findById(id)
-                .map(distrito -> {
-                    distritoRepository.delete(distrito);
+                .map(d -> {
+                    distritoRepository.delete(d);
                     return ResponseEntity.noContent().build();
                 })
-                .orElse(ResponseEntity.notFound().build());
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Distrito não encontrado"));
     }
-
-    @PutMapping("{id}")
-    public ResponseEntity<Distrito> atualizar(@Valid @PathVariable Long id, @RequestBody Distrito distritoAtualizado) {
-        return distritoRepository.findById(id)
-                .map(distrito -> {
-                    distrito.setCodigoDistrito(distritoAtualizado.getCodigoDistrito());
-                    distrito.setNomeDistrito(distritoAtualizado.getNomeDistrito());
-                    distrito.setMunicipio(distritoAtualizado.getMunicipio());
-                    distritoRepository.save(distrito);
-                    return ResponseEntity.ok(distrito);
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
 }
