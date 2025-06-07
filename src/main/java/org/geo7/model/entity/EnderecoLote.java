@@ -26,13 +26,24 @@ public class EnderecoLote implements Serializable {
     @Column(nullable = false)
     private Boolean ativo = true;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    private Date dhc = new Date();
+    @PrePersist
+    protected void onCreate() {
+        dhc = new Date();
+        dhm = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        dhm = new Date();
+    }
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date dhm = new Date();
+    private Date dhc;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    private Date dhm;
 
     @Column(length = 255)
     private String pontoDeReferencia;
@@ -55,7 +66,7 @@ public class EnderecoLote implements Serializable {
 
     @Override
     public String toString() {
-        return "Endereço do imóvel: " + lote;
+        return "Endereço do imóvel: lote_id=" + (lote != null ? lote.getId() : "null");
     }
 }
 

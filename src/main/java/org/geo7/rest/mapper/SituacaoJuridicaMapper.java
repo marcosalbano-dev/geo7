@@ -6,7 +6,10 @@ import org.geo7.rest.dto.SituacaoJuridicaDTO;
 public class SituacaoJuridicaMapper {
 
     public static SituacaoJuridicaDTO toDTO(SituacaoJuridica entity) {
-        return new SituacaoJuridicaDTO(entity.getId(), entity.getNome());
+        return new SituacaoJuridicaDTO(
+                entity.getId(),
+                entity.getNome()
+        );
     }
 
     public static SituacaoJuridica toEntity(SituacaoJuridicaDTO dto) {

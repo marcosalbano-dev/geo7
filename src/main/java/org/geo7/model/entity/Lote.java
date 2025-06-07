@@ -71,19 +71,6 @@ public class Lote implements Serializable {
     @Column
     private String dataTerminoPeriodoDeUso;
 
-
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "criado_por_id")
-//    private SecUser criadoPor;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "modificado_por_id")
-//    private SecUser modificadoPor;
-//
-
-
-
     @Override
     public String toString() {
         return "Lote{" +

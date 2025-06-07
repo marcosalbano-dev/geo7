@@ -16,10 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/disritos")
+@RequestMapping("/api/distritos")
 public class DistritoController {
 
+    @Autowired
     private final DistritoRepository distritoRepository;
+    @Autowired
     private final MunicipioRepository municipioRepository;
 
     public DistritoController(DistritoRepository distritoRepository, MunicipioRepository municipioRepository) {
@@ -36,9 +38,9 @@ public class DistritoController {
         return ResponseEntity.ok(DistritoDTO.fromEntity(salvo));
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<DistritoDTO> buscarPorId(@PathVariable Long id) {
-        return distritoRepository.findById(id)
+    @GetMapping("{codigoDistrito}")
+    public ResponseEntity<DistritoDTO> buscarPorId(@PathVariable String codigoDistrito) {
+        return distritoRepository.findByCodigoDistrito(codigoDistrito)
                 .map(DistritoDTO::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Distrito não encontrado"));

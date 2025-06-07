@@ -36,6 +36,10 @@ public record EnderecoLoteDTO(
         );
     }
 
+    /**
+     * Converte o DTO para entidade. As entidades relacionadas (Lote e Distrito) são instanciadas apenas com o ID.
+     * O serviço deve garantir que os IDs são válidos antes de persistir.
+     */
     public EnderecoLote toEntity() {
         EnderecoLote enderecoLote = new EnderecoLote();
         enderecoLote.setId(this.id());

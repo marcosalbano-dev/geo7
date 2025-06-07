@@ -2,12 +2,10 @@ package org.geo7.rest.dto;
 
 import org.geo7.model.entity.FormaObtencao;
 import org.geo7.model.entity.Lote;
-import org.geo7.model.entity.Municipio;
 import org.geo7.model.entity.SituacaoJuridica;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Set;
 
 public record FormaObtencaoDTO(
         Long id,
@@ -23,8 +21,29 @@ public record FormaObtencaoDTO(
         String municipioCartorio,
         Integer numeroHerdeiros,
         Date dataPosse,
+        Long loteId,
         Long situacaoJuridicaId
 ) {
+    public static FormaObtencaoDTO fromEntity(FormaObtencao entity) {
+        return new FormaObtencaoDTO(
+                entity.getId(),
+                entity.getDescricaoFormaDeObtencao(),
+                entity.getOficio(),
+                entity.getMatricula(),
+                entity.getLivro(),
+                entity.getNomeCartorio(),
+                entity.getDataRegistro(),
+                entity.getNumeroRegistro(),
+                entity.getAreaRegistrada(),
+                entity.getAreaMedida(),
+                entity.getMunicipioCartorio(),
+                entity.getNumeroHerdeiros(),
+                entity.getDataPosse(),
+                entity.getLote() != null ? entity.getLote().getId() : null,
+                entity.getSituacaoJuridica() != null ? entity.getSituacaoJuridica().getId() : null
+        );
+    }
+
     public FormaObtencao toEntity(Lote lote, SituacaoJuridica situacaoJuridica) {
         return FormaObtencao.builder()
                 .id(id)
@@ -44,24 +63,4 @@ public record FormaObtencaoDTO(
                 .situacaoJuridica(situacaoJuridica)
                 .build();
     }
-    public static FormaObtencaoDTO fromEntity(FormaObtencao entity) {
-        return new FormaObtencaoDTO(
-                entity.getId(),
-                entity.getDescricaoFormaDeObtencao(),
-                entity.getOficio(),
-                entity.getMatricula(),
-                entity.getLivro(),
-                entity.getNomeCartorio(),
-                entity.getDataRegistro(),
-                entity.getNumeroRegistro(),
-                entity.getAreaRegistrada(),
-                entity.getAreaMedida(),
-                entity.getMunicipioCartorio(),
-                entity.getNumeroHerdeiros(),
-                entity.getDataPosse(),
-                entity.getSituacaoJuridica() != null ? entity.getSituacaoJuridica().getId() : null
-        );
-    }
 }
-
-

@@ -1,7 +1,7 @@
 package org.geo7.rest.dto;
 
-import org.geo7.model.entity.Distrito;
-import org.geo7.model.entity.Municipio;
+
+import org.geo7.model.entity.*;
 
 public record DistritoDTO(
         Long id,

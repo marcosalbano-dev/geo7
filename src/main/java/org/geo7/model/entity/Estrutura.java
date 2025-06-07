@@ -23,14 +23,6 @@ public class Estrutura implements Serializable {
     @JoinColumn(name = "lote_id", nullable = false)
     private Lote lote;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "criado_por_id", nullable = true)
-//    private SecUser criadoPor;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "modificado_por_id", nullable = true)
-//    private SecUser modificadoPor;
-
     private boolean ativo = true;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -99,14 +91,12 @@ public class Estrutura implements Serializable {
     private Boolean isLagoaPerene = false;
     @Column
     private String usoDaguaLagoa;
-
     @Column
     private Boolean isPoco = false;
     @Column
     private Boolean isPocoPerene = false;
     @Column
     private String usoDaguaPoco;
-
     @Column
     private Boolean isRioOuRiacho = false;
     @Column

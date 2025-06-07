@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/api/enderecoLote")
+@RequestMapping("/api/endereco-lote")
 public class EnderecoLoteController {
 
     @Autowired
