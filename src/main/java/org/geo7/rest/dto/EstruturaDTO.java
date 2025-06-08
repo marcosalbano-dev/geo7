@@ -1,5 +1,6 @@
 package org.geo7.rest.dto;
 
+import jakarta.validation.constraints.NotNull;
 import org.geo7.model.entity.Estrutura;
 import org.geo7.model.entity.Lote;
 
@@ -8,6 +9,7 @@ import java.util.Date;
 
 public record EstruturaDTO(
         Long id,
+        @NotNull(message = "O ID do lote é obrigatório")
         Long loteId,
         Boolean ativo,
         Date dhc,

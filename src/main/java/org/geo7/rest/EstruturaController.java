@@ -49,6 +49,11 @@ public class EstruturaController {
 
     @PostMapping
     public ResponseEntity<EstruturaDTO> create(@Valid @RequestBody EstruturaDTO dto) {
+        if (dto.loteId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "O ID do lote é obrigatório");
+        }
+
         Lote lote = loteRepository.findById(dto.loteId())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Lote não encontrado com id: " + dto.loteId()));
