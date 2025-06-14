@@ -47,13 +47,18 @@ public class DistritoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DistritoDTO>> listarTodos() {
-        var distritos = distritoRepository.findAll().stream()
+    public ResponseEntity<List<DistritoDTO>> listarPorMunicipio(@RequestParam(required = false) Long municipioId) {
+        List<Distrito> distritos;
+        if (municipioId != null) {
+            distritos = distritoRepository.findByMunicipioId(municipioId);
+        } else {
+            distritos = distritoRepository.findAll();
+        }
+        List<DistritoDTO> dtoList = distritos.stream()
                 .map(DistritoDTO::fromEntity)
                 .toList();
-        return ResponseEntity.ok(distritos);
+        return ResponseEntity.ok(dtoList);
     }
-
     @PutMapping("{id}")
     public ResponseEntity<DistritoDTO> atualizar(@PathVariable Long id, @RequestBody @Valid DistritoDTO dto) {
         return distritoRepository.findById(id)

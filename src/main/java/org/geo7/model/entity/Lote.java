@@ -71,6 +71,16 @@ public class Lote implements Serializable {
     @Column
     private String dataTerminoPeriodoDeUso;
 
+    public void addFormaObtencao(FormaObtencao forma) {
+        forma.setLote(this);
+        this.formaObtencao.add(forma);
+    }
+
+    public void removeFormaObtencao(FormaObtencao forma) {
+        forma.setLote(null);
+        this.formaObtencao.remove(forma);
+    }
+
     @Override
     public String toString() {
         return "Lote{" +
@@ -82,6 +92,18 @@ public class Lote implements Serializable {
                 ", cpf='" + cpf + '\'' +
                 ", municipio=" + (municipio != null ? municipio.getNome() : "N/A") +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Lote lote)) return false;
+        return id != null && id.equals(lote.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
 }

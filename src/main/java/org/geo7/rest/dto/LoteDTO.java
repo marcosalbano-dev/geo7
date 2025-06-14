@@ -28,6 +28,12 @@ public record LoteDTO(
         String dataTerminoPeriodoDeUso
 ) {
     public static LoteDTO fromEntity(Lote lote) {
+        Set<FormaObtencaoDTO> formasDTO = lote.getFormaObtencao() != null
+                ? new java.util.HashSet<>(lote.getFormaObtencao()).stream()
+                .map(FormaObtencaoDTO::fromEntity)
+                .collect(Collectors.toSet())
+                : Set.of();
+
         return new LoteDTO(
                 lote.getId(),
                 lote.getProprietario(),
@@ -41,15 +47,13 @@ public record LoteDTO(
                 lote.getCpf(),
                 lote.getMunicipio() != null ? lote.getMunicipio().getId() : null,
                 lote.getMunicipio() != null ? lote.getMunicipio().getNome() : null,
-                lote.getFormaObtencao().stream()
-                        .map(FormaObtencaoDTO::fromEntity)
-                        .collect(Collectors.toSet()),
+                formasDTO,
                 lote.getSituacaoJuridica() != null ? lote.getSituacaoJuridica().getId() : null,
                 lote.getDataTerminoPeriodoDeUso()
         );
     }
 
-    public Lote toEntity(Municipio municipio, SituacaoJuridica situacaoJuridica, Set<FormaObtencao> formas) {
+    public Lote toEntity(Municipio municipio, SituacaoJuridica situacaoJuridica) {
         Lote lote = new Lote();
         lote.setId(id);
         lote.setProprietario(proprietario);
@@ -64,10 +68,6 @@ public record LoteDTO(
         lote.setMunicipio(municipio);
         lote.setSituacaoJuridica(situacaoJuridica);
         lote.setDataTerminoPeriodoDeUso(dataTerminoPeriodoDeUso);
-
-        formas.forEach(f -> f.setLote(lote)); // vincula o lote a cada forma
-        lote.setFormaObtencao(formas);
-
         return lote;
     }
 }

@@ -12,13 +12,13 @@ import org.geo7.rest.dto.LoteDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api/lotes")
 public class LoteController {
@@ -42,18 +42,19 @@ public class LoteController {
         Municipio municipio = municipioRepository.findById(dto.municipioId())
                 .orElseThrow(() -> new RuntimeException("Município não encontrado"));
 
-        SituacaoJuridica sj = dto.situacaoJuridicaId() != null ? situacaoJuridicaRepository.findById(dto.situacaoJuridicaId())
-                .orElseThrow(() -> new RuntimeException("Situação jurídica não encontrada")) : null;
+        SituacaoJuridica sj = dto.situacaoJuridicaId() != null
+                ? situacaoJuridicaRepository.findById(dto.situacaoJuridicaId())
+                .orElseThrow(() -> new RuntimeException("Situação jurídica não encontrada"))
+                : null;
 
-        Set<FormaObtencao> formas = dto.formaObtencao().stream()
-                .map(f -> {
-                    SituacaoJuridica sjForma = situacaoJuridicaRepository.findById(f.situacaoJuridicaId())
-                            .orElseThrow(() -> new RuntimeException("Situação jurídica de forma de obtenção inválida"));
-                    return f.toEntity(null, sjForma); // lote será setado depois
-                })
-                .collect(Collectors.toSet());
+        Lote lote = dto.toEntity(municipio, sj);
 
-        Lote lote = dto.toEntity(municipio, sj, formas);
+        dto.formaObtencao().forEach(f -> {
+            SituacaoJuridica sjForma = situacaoJuridicaRepository.findById(f.situacaoJuridicaId())
+                    .orElseThrow(() -> new RuntimeException("Situação jurídica de forma de obtenção inválida"));
+            FormaObtencao forma = f.toEntity(lote, sjForma); // vincula lote automaticamente
+            lote.addFormaObtencao(forma); // mantém integridade da relação
+        });
 
         Lote salvo = loteRepository.save(lote);
         return ResponseEntity.ok(LoteDTO.fromEntity(salvo));
@@ -68,8 +69,9 @@ public class LoteController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<LoteDTO>> listarTodos() {
-        List<LoteDTO> lotes = loteRepository.findAll()
+        List<LoteDTO> lotes = loteRepository.findAllWithFormaObtencao()
                 .stream()
                 .map(LoteDTO::fromEntity)
                 .toList();
@@ -88,16 +90,16 @@ public class LoteController {
                             .orElseThrow(() -> new RuntimeException("Situação jurídica não encontrada"))
                             : null;
 
-                    Set<FormaObtencao> formas = dto.formaObtencao().stream()
-                            .map(f -> {
-                                SituacaoJuridica sjForma = situacaoJuridicaRepository.findById(f.situacaoJuridicaId())
-                                        .orElseThrow(() -> new RuntimeException("Situação jurídica inválida"));
-                                return f.toEntity(null, sjForma); // vínculo ao lote é feito em toEntity()
-                            })
-                            .collect(Collectors.toSet());
-
-                    Lote atualizado = dto.toEntity(municipio, sj, formas);
+                    Lote atualizado = dto.toEntity(municipio, sj);
                     atualizado.setId(id); // garante atualização
+
+                    dto.formaObtencao().forEach(f -> {
+                        SituacaoJuridica sjForma = situacaoJuridicaRepository.findById(f.situacaoJuridicaId())
+                                .orElseThrow(() -> new RuntimeException("Situação jurídica inválida"));
+                        FormaObtencao forma = f.toEntity(atualizado, sjForma);
+                        atualizado.addFormaObtencao(forma);
+                    });
+
                     return ResponseEntity.ok(LoteDTO.fromEntity(loteRepository.save(atualizado)));
                 })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado"));
