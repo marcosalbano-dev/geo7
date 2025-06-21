@@ -1,12 +1,13 @@
 package org.geo7.model.entity;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 
 @Entity
 @Table(name = "situacoes_juridicas", schema = "geo7")
@@ -23,9 +24,24 @@ public class SituacaoJuridica implements Serializable {
     @Column(length = 50)
     private String nome;
 
+    @Column(nullable = false)
+    private Boolean ativo = true;
+
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dhc = new Date();
+
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dhm = new Date();
+
     @OneToMany(mappedBy = "situacaoJuridica", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<Lote> lotes = new HashSet<>();
+
+    @OneToMany(mappedBy = "situacaoJuridica", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private Set<FormaObtencao> formaObtencao = new HashSet<>();
 
     @Override
     public String toString() {

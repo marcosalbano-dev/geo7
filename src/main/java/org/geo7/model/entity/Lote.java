@@ -71,6 +71,10 @@ public class Lote implements Serializable {
     @Column
     private String dataTerminoPeriodoDeUso;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "distrito_id")
+    private Distrito distrito;
+
     public void addFormaObtencao(FormaObtencao forma) {
         forma.setLote(this);
         this.formaObtencao.add(forma);

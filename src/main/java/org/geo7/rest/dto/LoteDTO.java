@@ -1,14 +1,9 @@
 package org.geo7.rest.dto;
 
-import org.geo7.model.entity.FormaObtencao;
-import org.geo7.model.entity.Lote;
-import org.geo7.model.entity.Municipio;
-import org.geo7.model.entity.SituacaoJuridica;
+import org.geo7.model.entity.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public record LoteDTO(
         Long id,
@@ -23,17 +18,12 @@ public record LoteDTO(
         String cpf,
         Long municipioId,
         String municipioNome,
-        Set<FormaObtencaoDTO> formaObtencao,
+        String formaObtencaoSelecionada, // substitui Set<FormaObtencaoDTO>
         Long situacaoJuridicaId,
-        String dataTerminoPeriodoDeUso
+        String dataTerminoPeriodoDeUso,
+        Long distritoId
 ) {
     public static LoteDTO fromEntity(Lote lote) {
-        Set<FormaObtencaoDTO> formasDTO = lote.getFormaObtencao() != null
-                ? new java.util.HashSet<>(lote.getFormaObtencao()).stream()
-                .map(FormaObtencaoDTO::fromEntity)
-                .collect(Collectors.toSet())
-                : Set.of();
-
         return new LoteDTO(
                 lote.getId(),
                 lote.getProprietario(),
@@ -47,13 +37,15 @@ public record LoteDTO(
                 lote.getCpf(),
                 lote.getMunicipio() != null ? lote.getMunicipio().getId() : null,
                 lote.getMunicipio() != null ? lote.getMunicipio().getNome() : null,
-                formasDTO,
+                lote.getFormaObtencao() != null && !lote.getFormaObtencao().isEmpty()
+                        ? lote.getFormaObtencao().iterator().next().getDescricaoFormaDeObtencao() : null,
                 lote.getSituacaoJuridica() != null ? lote.getSituacaoJuridica().getId() : null,
-                lote.getDataTerminoPeriodoDeUso()
+                lote.getDataTerminoPeriodoDeUso(),
+                lote.getDistrito() != null ? lote.getDistrito().getId() : null
         );
     }
 
-    public Lote toEntity(Municipio municipio, SituacaoJuridica situacaoJuridica) {
+    public Lote toEntity(Municipio municipio, SituacaoJuridica situacaoJuridica, Distrito distrito) {
         Lote lote = new Lote();
         lote.setId(id);
         lote.setProprietario(proprietario);
@@ -67,8 +59,8 @@ public record LoteDTO(
         lote.setCpf(cpf);
         lote.setMunicipio(municipio);
         lote.setSituacaoJuridica(situacaoJuridica);
+        lote.setDistrito(distrito);
         lote.setDataTerminoPeriodoDeUso(dataTerminoPeriodoDeUso);
         return lote;
     }
 }
-
