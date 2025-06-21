@@ -1,0 +1,71 @@
+package org.geo7.rest.dto;
+
+import org.geo7.model.entity.DocumentoPessoa;
+
+public record DocumentoPessoaDTO(
+        Long id,
+        Long pessoaId,
+        String tipoDocumentoIdentificacao,
+        String numeroDocumentoIdentificacao,
+        String orgaoEmissor,
+        String ufOrgaoEmissor,
+        String tipoNacionalidade,
+        String cpf,
+        String codigoPaisOrigem,
+        String estadoCivil,
+        String tipoPessoa,
+        String cnpj,
+        String naturezaJuridica,
+        Double capitalNacional,
+        Double capitalEstrangeiro,
+        String registroJuntaComercial,
+        String nomeFantasia,
+        String codigoPaisSede,
+        String ufPaisSede,
+        String tipoDocumentoRepresentanteLegal,
+        String numeroDocumentoRepresentanteLegal,
+        String codigoPaisResidencia,
+        String tipoDePoder,
+        String tipoDeGoverno,
+        String percentCapitalNacional,
+        String percentCapitalEstrangeiro,
+        String pcePais,
+        String pcePercentCapital,
+        String obsevacoesQuadro7,
+        Long naturalidadeId
+) {
+    public static DocumentoPessoaDTO fromEntity(DocumentoPessoa d) {
+        return new DocumentoPessoaDTO(
+                d.getId(),
+                d.getPessoa() != null ? d.getPessoa().getId() : null,
+                d.getTipoDocumentoIdentificacao(),
+                d.getNumeroDocumentoIdentificacao(),
+                d.getOrgaoEmissor(),
+                d.getUfOrgaoEmissor(),
+                d.getTipoNacionalidade(),
+                d.getCpf(),
+                d.getCodigoPaisOrigem(),
+                d.getEstadoCivil(),
+                d.getTipoPessoa(),
+                d.getCnpj(),
+                d.getNaturezaJuridica(),
+                d.getCapitalNacional(),
+                d.getCapitalEstrangeiro(),
+                d.getRegistroJuntaComercial(),
+                d.getNomeFantasia(),
+                d.getCodigoPaisSede(),
+                d.getUfPaisSede(),
+                d.getTipoDocumentoRepresentanteLegal(),
+                d.getNumeroDocumentoRepresentanteLegal(),
+                d.getCodigoPaisResidencia(),
+                d.getTipoDePoder(),
+                d.getTipoDeGoverno(),
+                d.getPercentCapitalNacional(),
+                d.getPercentCapitalEstrangeiro(),
+                d.getPcePais(),
+                d.getPcePercentCapital(),
+                d.getObsevacoesQuadro7(),
+                d.getNaturalidade() != null ? d.getNaturalidade().getId() : null
+        );
+    }
+}

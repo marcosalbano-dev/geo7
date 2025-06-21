@@ -5,7 +5,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.Set;
 @Entity
-@Table(name = "pronaf", schema = "regularizacaofundiaria")
+@Table(name = "pronaf", schema = "geo7")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +16,7 @@ public class Pronaf implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pronaf_seq")
     @SequenceGenerator(
             name = "pronaf_seq",
-            sequenceName = "regularizacaofundiaria.pronaf_id_seq",
+            sequenceName = "geo7.pronaf_id_seq",
             allocationSize = 1
     )
     private Long id;

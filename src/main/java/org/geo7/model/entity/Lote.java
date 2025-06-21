@@ -64,6 +64,9 @@ public class Lote implements Serializable {
     @JsonIgnore
     private Set<FormaObtencao> formaObtencao = new HashSet<>();
 
+    @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PessoaLote> pessoasLote = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "situacao_juridica_id")
     private SituacaoJuridica situacaoJuridica;
