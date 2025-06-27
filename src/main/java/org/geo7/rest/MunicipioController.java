@@ -37,6 +37,16 @@ public class MunicipioController {
         return ResponseEntity.ok(MunicipioDTO.fromEntity(municipio));
     }
 
+    @GetMapping("/estado/{uf}")
+    public List<Municipio> getMunicipiosByUf(@PathVariable String uf) {
+        return municipioRepository.findByUfOrderByNomeAsc(uf.toUpperCase());
+    }
+
+//    @GetMapping("/ufs")
+//    public List<String> getDistinctUfs() {
+//        return municipioRepository.findDistinctUfs();
+//    }
+
     @GetMapping
     public List<MunicipioDTO> findAll() {
         return municipioRepository.findAll()

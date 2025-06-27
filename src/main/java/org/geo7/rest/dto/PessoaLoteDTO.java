@@ -1,6 +1,9 @@
 package org.geo7.rest.dto;
 
+import org.geo7.model.entity.Lote;
+import org.geo7.model.entity.Pessoa;
 import org.geo7.model.entity.PessoaLote;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -45,5 +48,28 @@ public record PessoaLoteDTO(
                 pl.getDataTerminoContrato(),
                 pl.getIsContratoPrazoIndeterminado()
         );
+    }
+
+    public PessoaLote toEntity(Pessoa pessoa, Lote lote) {
+        return PessoaLote.builder()
+                .id(this.id)
+                .pessoa(pessoa)
+                .lote(lote)
+                .dateCreated(this.dateCreated)
+                .lastUpdated(this.lastUpdated)
+                .codigoImovelRural(this.codigoImovelRural)
+                .condicaoPessoaImovelRural(this.condicaoPessoaImovelRural)
+                .percentDetencao(this.percentDetencao)
+                .isDeclarante(this.isDeclarante)
+                .isResideNoImovel(this.isResideNoImovel)
+                .tipoDoAto(this.tipoDoAto)
+                .numeroAto(this.numeroAto)
+                .dataAto(this.dataAto)
+                .quantidadeAreaCedida(this.quantidadeAreaCedida)
+                .atividadePrincipalExploracao(this.atividadePrincipalExploracao)
+                .contrato(this.contrato)
+                .dataTerminoContrato(this.dataTerminoContrato)
+                .isContratoPrazoIndeterminado(this.isContratoPrazoIndeterminado)
+                .build();
     }
 }

@@ -4,7 +4,6 @@ import org.geo7.model.entity.Pessoa;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public record PessoaDTO(
         Long id,
@@ -18,48 +17,100 @@ public record PessoaDTO(
         Date dataNascimento,
         String sexoPessoa,
         Boolean isEspolio,
+
+        // Anexo
         String codigoPessoaIncra,
         String coordenadaEste,
         String coordenadaNorte,
         String atividadePrincipal,
+
+        // Cônjuge e outros
         String regimeDeBens,
         String dataCasamento,
+
         Boolean isRecebePronaf,
         Boolean isRecebeAjudoProgramaGoverno,
         Integer qtdPronaf,
         BigDecimal valorTotalPronafs,
+
         String racaCor,
-        Set<Long> programasDoGovernoIds, // IDs dos programas
-        Set<Long> pronafIds // IDs dos pronafs
+
+        // Relacionamentos por ID (opcional, implemente depois se precisar)
+        Set<Long> programasDoGovernoIds, // Exemplo, se quiser retornar IDs dos programas
+
+        Set<Long> pronafsIds // Exemplo, se quiser retornar IDs dos pronafs
 ) {
-    public static PessoaDTO fromEntity(Pessoa p) {
+    public static PessoaDTO fromEntity(Pessoa pessoa) {
+        // Se precisar retornar os IDs dos programas do governo:
+        Set<Long> pronafsIds = null;
+        if (pessoa.getPronafs() != null) {
+            pronafsIds = pessoa.getPronafs()
+                    .stream()
+                    .map(pg -> pg.getId())
+                    .collect(java.util.stream.Collectors.toSet());
+        }
+
+        Set<Long> programasIds = null;
+        if (pessoa.getProgramasDoGoverno() != null) {
+            programasIds = pessoa.getProgramasDoGoverno()
+                    .stream()
+                    .map(pg -> pg.getId())
+                    .collect(java.util.stream.Collectors.toSet());
+        }
         return new PessoaDTO(
-                p.getId(),
-                p.getNome(),
-                p.getTelefone(),
-                p.getFax(),
-                p.getRamal(),
-                p.getEmail(),
-                p.getNomePai(),
-                p.getNomeMae(),
-                p.getDataNascimento(),
-                p.getSexoPessoa(),
-                p.getIsEspolio(),
-                p.getCodigoPessoaIncra(),
-                p.getCoordenadaEste(),
-                p.getCoordenadaNorte(),
-                p.getAtividadePrincipal(),
-                p.getRegimeDeBens(),
-                p.getDataCasamento(),
-                p.getIsRecebePronaf(),
-                p.getIsRecebeAjudoProgramaGoverno(),
-                p.getQtdPronaf(),
-                p.getValorTotalPronafs(),
-                p.getRacaCor(),
-                p.getProgramasDoGoverno() != null ?
-                        p.getProgramasDoGoverno().stream().map(pg -> pg.getId()).collect(Collectors.toSet()) : null,
-                p.getPronafs() != null ?
-                        p.getPronafs().stream().map(pr -> pr.getId()).collect(Collectors.toSet()) : null
+                pessoa.getId(),
+                pessoa.getNome(),
+                pessoa.getTelefone(),
+                pessoa.getFax(),
+                pessoa.getRamal(),
+                pessoa.getEmail(),
+                pessoa.getNomePai(),
+                pessoa.getNomeMae(),
+                pessoa.getDataNascimento(),
+                pessoa.getSexoPessoa(),
+                pessoa.getIsEspolio(),
+                pessoa.getCodigoPessoaIncra(),
+                pessoa.getCoordenadaEste(),
+                pessoa.getCoordenadaNorte(),
+                pessoa.getAtividadePrincipal(),
+                pessoa.getRegimeDeBens(),
+                pessoa.getDataCasamento(),
+                pessoa.getIsRecebePronaf(),
+                pessoa.getIsRecebeAjudoProgramaGoverno(),
+                pessoa.getQtdPronaf(),
+                pessoa.getValorTotalPronafs(),
+                pessoa.getRacaCor(),
+                programasIds,
+                pronafsIds
         );
+    }
+
+    public Pessoa toEntity() {
+        Pessoa pessoa = new Pessoa();
+        pessoa.setId(id);
+        pessoa.setNome(nome);
+        pessoa.setTelefone(telefone);
+        pessoa.setFax(fax);
+        pessoa.setRamal(ramal);
+        pessoa.setEmail(email);
+        pessoa.setNomePai(nomePai);
+        pessoa.setNomeMae(nomeMae);
+        pessoa.setDataNascimento(dataNascimento);
+        pessoa.setSexoPessoa(sexoPessoa);
+        pessoa.setIsEspolio(isEspolio != null ? isEspolio : false);
+        pessoa.setCodigoPessoaIncra(codigoPessoaIncra);
+        pessoa.setCoordenadaEste(coordenadaEste);
+        pessoa.setCoordenadaNorte(coordenadaNorte);
+        pessoa.setAtividadePrincipal(atividadePrincipal);
+        pessoa.setRegimeDeBens(regimeDeBens);
+        pessoa.setDataCasamento(dataCasamento);
+        pessoa.setIsRecebePronaf(isRecebePronaf != null ? isRecebePronaf : false);
+        pessoa.setIsRecebeAjudoProgramaGoverno(isRecebeAjudoProgramaGoverno != null ? isRecebeAjudoProgramaGoverno : false);
+        pessoa.setQtdPronaf(qtdPronaf != null ? qtdPronaf : 0);
+        pessoa.setValorTotalPronafs(valorTotalPronafs != null ? valorTotalPronafs : BigDecimal.ZERO);
+        pessoa.setRacaCor(racaCor);
+        // **Relacionamentos:**
+        // Aqui você pode popular programasDoGoverno via Service/Repository no Controller se precisar.
+        return pessoa;
     }
 }

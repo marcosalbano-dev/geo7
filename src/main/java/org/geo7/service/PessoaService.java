@@ -150,8 +150,8 @@ public class PessoaService {
 
         // Pronafs
         pessoa.getPronafs().clear();
-        if (dto.getPessoa().pronafIds() != null) {
-            for (Long pronafId : dto.getPessoa().pronafIds()) {
+        if (dto.getPessoa().pronafsIds() != null) {
+            for (Long pronafId : dto.getPessoa().pronafsIds()) {
                 pronafRepository.findById(pronafId).ifPresent(pessoa.getPronafs()::add);
             }
         }
