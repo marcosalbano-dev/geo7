@@ -65,6 +65,7 @@ public class PessoaLote {
     @Temporal(TemporalType.DATE)
     private Date dataTerminoContrato;
 
+    @Column(nullable = false)
     private Boolean isContratoPrazoIndeterminado = false;
 
     @PrePersist

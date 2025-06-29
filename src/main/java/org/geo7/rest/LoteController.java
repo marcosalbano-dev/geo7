@@ -45,6 +45,7 @@ public class LoteController {
     @PostMapping
     public ResponseEntity<LoteDTO> salvarEstrutura(@Valid @RequestBody LoteDTO dto) {
         Optional<Municipio> municipioOpt = municipioRepository.findById(dto.municipioId());
+        System.out.println("SituacaoJuridicaId recebido: " + dto.situacaoJuridicaId());
         Optional<SituacaoJuridica> situacaoOpt = situacaoJuridicaRepository.findById(dto.situacaoJuridicaId());
 
         if (municipioOpt.isEmpty() || situacaoOpt.isEmpty()) {
