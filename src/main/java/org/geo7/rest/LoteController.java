@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/lotes")
+@CrossOrigin(origins = "http://localhost:4200")
 public class LoteController {
 
     @Autowired
@@ -85,6 +86,14 @@ public class LoteController {
                 .map(LoteDTO::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado"));
+    }
+
+    @GetMapping("{proprietario}")
+    public ResponseEntity<LoteDTO> buscarPorProprietario(@PathVariable String proprietario) {
+        return loteRepository.findByProprietario(proprietario)
+                .map(LoteDTO::fromEntity)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Proprietário não encontrado"));
     }
 
     @GetMapping
