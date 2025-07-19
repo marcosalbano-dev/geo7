@@ -65,7 +65,18 @@ public record EstruturaDTO(
         String municipioCartorio,
         Integer numeroHerdeirosForma,
         String dataPosse,
-        String situacaoSelecionada
+        String situacaoSelecionada,
+        Long situacaoJuridicaId,
+
+        // CAMPOS DO LOTE
+        String numero,
+        String sncr,
+        String denominacaoImovel,
+        BigDecimal area,
+        String municipioNome,
+        Long municipioId,
+        Long distritoId
+
 ) {
     public static EstruturaDTO fromEntity(Estrutura estrutura) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -153,7 +164,16 @@ public record EstruturaDTO(
                 forma != null ? forma.getMunicipioCartorio() : null,
                 forma != null ? forma.getNumeroHerdeiros() : null,
                 dataPosseFormatada, // Usando a variável segura
-                situacao != null ? situacao.getNome() : null
+                situacao != null ? situacao.getNome() : null,
+                situacao != null ? situacao.getId() : null,
+                estrutura.getLote() != null ? estrutura.getLote().getNumero() : null,
+                estrutura.getLote() != null ? estrutura.getLote().getSncr() : null,
+                estrutura.getLote() != null ? estrutura.getLote().getDenominacaoImovel() : null,
+                estrutura.getLote() != null ? estrutura.getLote().getArea() : null,
+                estrutura.getLote() != null && estrutura.getLote().getMunicipio() != null ? estrutura.getLote().getMunicipio().getNome() : null,
+                estrutura.getLote() != null && estrutura.getLote().getMunicipio() != null ? estrutura.getLote().getMunicipio().getId() : null,
+                estrutura.getLote() != null && estrutura.getLote().getDistrito() != null ? estrutura.getLote().getDistrito().getId() : null
+
         );
     }
 
@@ -170,10 +190,10 @@ public record EstruturaDTO(
             if (areaMedida != null && !areaMedida.isBlank()) {
                 areaMedidaValue = new BigDecimal(areaMedida);
             }
-            if (dataPosse != null && !dataPosse.isBlank()) {
+            if (dataPosse != null && !dataPosse.isBlank() && !"null".equals(dataPosse)) {
                 dataPosseDate = new SimpleDateFormat("yyyy-MM-dd").parse(dataPosse);
             }
-            if (dataRegistro != null && !dataRegistro.isBlank()) {
+            if (dataRegistro != null && !dataRegistro.isBlank() && !"null".equals(dataRegistro)) {
                 dataRegistroDate = new SimpleDateFormat("yyyy-MM-dd").parse(dataRegistro);
             }
         } catch (Exception e) {

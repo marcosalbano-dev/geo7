@@ -21,7 +21,9 @@ public record LoteDTO(
         String formaObtencaoSelecionada, // substitui Set<FormaObtencaoDTO>
         Long situacaoJuridicaId,
         String dataTerminoPeriodoDeUso,
-        Long distritoId
+        Long distritoId,
+        String distritoNome,
+        String situacaoJuridicaNome
 ) {
     public static LoteDTO fromEntity(Lote lote) {
         return new LoteDTO(
@@ -41,7 +43,9 @@ public record LoteDTO(
                         ? lote.getFormaObtencao().iterator().next().getDescricaoFormaDeObtencao() : null,
                 lote.getSituacaoJuridica() != null ? lote.getSituacaoJuridica().getId() : null,
                 lote.getDataTerminoPeriodoDeUso(),
-                lote.getDistrito() != null ? lote.getDistrito().getId() : null
+                lote.getDistrito() != null ? lote.getDistrito().getId() : null,
+                lote.getDistrito() != null ? lote.getDistrito().getNomeDistrito() : null,
+                lote.getSituacaoJuridica() != null ? lote.getSituacaoJuridica().getNome() : null
         );
     }
 

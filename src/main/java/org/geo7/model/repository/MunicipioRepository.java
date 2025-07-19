@@ -12,8 +12,5 @@ public interface MunicipioRepository extends JpaRepository<Municipio, Long> {
 
     List<Municipio> findByUfOrderByNomeAsc(String uf);
 
-//
-//    @Query("SELECT DISTINCT m.uf FROM Municipio m ORDER BY m.uf")
-//    List<String> findDistinctUfs();
 
 }

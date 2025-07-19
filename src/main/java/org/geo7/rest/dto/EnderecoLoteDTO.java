@@ -4,6 +4,7 @@ import org.geo7.model.entity.Distrito;
 import org.geo7.model.entity.EnderecoLote;
 import org.geo7.model.entity.Lote;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -19,7 +20,7 @@ public record EnderecoLoteDTO(
         Long distritoId,
         String comunidade,
         String localidade
-) {
+) implements Serializable {
     public static EnderecoLoteDTO fromEntity(EnderecoLote enderecoLote) {
         return new EnderecoLoteDTO(
                 enderecoLote.getId(),

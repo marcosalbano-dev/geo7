@@ -51,6 +51,13 @@ public class EstruturaController {
         return ResponseEntity.ok(estruturas);
     }
 
+    @GetMapping("estruturas/por-lote/{loteId}")
+    public ResponseEntity<EstruturaDTO> buscarPorLoteId(@PathVariable Long loteId) {
+        Optional<Estrutura> estrutura = estruturaRepository.findByLoteId(loteId);
+        return estrutura.map(value -> ResponseEntity.ok(EstruturaDTO.fromEntity(value)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<EstruturaDTO> findById(@PathVariable Long id) {
         return estruturaRepository.findById(id)
@@ -102,21 +109,27 @@ public class EstruturaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EstruturaDTO> update(@PathVariable Long id,
+    public ResponseEntity<EstruturaDTO> atualizar(@PathVariable Long id,
                                                @Valid @RequestBody EstruturaDTO dto) {
+        System.out.println("Recebido id: " + id);
+        System.out.println("DTO.id: " + dto.id());
+        System.out.println("DTO.loteId: " + dto.loteId());
+        System.out.println("DTO.situacaoJuridicaId: " + dto.situacaoJuridicaId());
+        System.out.println("DTO.formaObtencaoId: " + dto.formaObtencaoSelecionada());
+        System.out.println("DTO.municipioId: " + dto.municipioId());
+        System.out.println("DTO.distritoId: " + dto.distritoId());
         return estruturaRepository.findById(id)
                 .map(existingEstrutura -> {
+                    System.out.println("DEBUG dto.loteId: " + dto.loteId());
                     Lote lote = loteRepository.findById(dto.loteId())
                             .orElseThrow(() -> new ResponseStatusException(
                                     HttpStatus.BAD_REQUEST, "Lote não encontrado com id: " + dto.loteId()));
 
                     String tipo = dto.situacaoSelecionada();
-                    SituacaoJuridica situacao = situacaoJuridicaRepository.findByNome(tipo)
-                            .orElseGet(() -> {
-                                SituacaoJuridica nova = new SituacaoJuridica();
-                                nova.setNome(tipo);
-                                return situacaoJuridicaRepository.save(nova);
-                            });
+                    System.out.println("DEBUG dto.situacaoJuridicaId: " + dto.situacaoJuridicaId());
+                    SituacaoJuridica situacao = situacaoJuridicaRepository.findById(dto.situacaoJuridicaId())
+                            .orElseThrow(() -> new ResponseStatusException(
+                                    HttpStatus.BAD_REQUEST, "Situação jurídica não encontrada com id: " + dto.situacaoJuridicaId()));
 
                     Estrutura updated = dto.toEntity(lote, situacao);
                     updated.setId(id);
