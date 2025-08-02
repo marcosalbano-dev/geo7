@@ -87,14 +87,14 @@ public class Pessoa {
     private Set<Pronaf> pronafs = new HashSet<>();
 
 
-    @ManyToMany
-    @JoinTable(
-            name = "pessoa_programa_governo",
-            schema = "geo7",
-            joinColumns = @JoinColumn(name = "pessoa_id"),
-            inverseJoinColumns = @JoinColumn(name = "programa_governo_id")
-    )
-    private Set<ProgramaGoverno> programasDoGoverno = new HashSet<>();
+//    @ManyToMany
+//    @JoinTable(
+//            name = "pessoa_programa_governo",
+//            schema = "geo7",
+//            joinColumns = @JoinColumn(name = "pessoa_id"),
+//            inverseJoinColumns = @JoinColumn(name = "programa_governo_id")
+//    )
+//    private Set<ProgramaGoverno> programasDoGoverno = new HashSet<>();
 
 
      @OneToOne(mappedBy = "pessoa", cascade = CascadeType.ALL)
@@ -107,6 +107,8 @@ public class Pessoa {
         if (nomePai != null) nomePai = nomePai.toUpperCase();
         if (nomeMae != null) nomeMae = nomeMae.toUpperCase();
     }
+
+
 
     @Override
     public String toString() {

@@ -11,8 +11,11 @@ public record EnderecoPessoaDTO(
         String cep,
         String codigoPaisResidencia,
         Long municipioId,
-        String uf
+        String municipioNome,
+        String uf,
+        Long pessoaId
 ) {
+    // Converte de Entidade para DTO
     public static EnderecoPessoaDTO fromEntity(EnderecoPessoa e) {
         return new EnderecoPessoaDTO(
                 e.getId(),
@@ -23,7 +26,25 @@ public record EnderecoPessoaDTO(
                 e.getCep(),
                 e.getCodigoPaisResidencia(),
                 e.getMunicipio() != null ? e.getMunicipio().getId() : null,
-                e.getMunicipio() != null ? e.getMunicipio().getUf() : null
+                e.getMunicipio() != null ? e.getMunicipio().getNome() : null,
+                e.getMunicipio() != null ? e.getMunicipio().getUf() : null,
+                e.getPessoa() != null ? e.getPessoa().getId() : null
         );
+    }
+
+    // Converte de DTO para Entidade (útil no service!)
+    public EnderecoPessoa toEntity() {
+        EnderecoPessoa endereco = new EnderecoPessoa();
+        endereco.setId(this.id());
+        endereco.setLogradouro(this.logradouro());
+        endereco.setComplemento(this.complemento());
+        endereco.setNumero(this.numero());
+        endereco.setBairro(this.bairro());
+        endereco.setCep(this.cep());
+        endereco.setCodigoPaisResidencia(this.codigoPaisResidencia());
+
+
+        // Observação: municipio e pessoa devem ser setados no service, pois precisa buscar entidades completas!
+        return endereco;
     }
 }

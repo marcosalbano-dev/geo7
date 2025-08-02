@@ -1,12 +1,10 @@
 package org.geo7.rest.dto;
 
-import lombok.Data;
+public record AtualizaDetentorRequestDTO(
+        PessoaDTO pessoa,
+        PessoaLoteDTO pessoaLote,
+        EnderecoPessoaDTO endereco,
+        DocumentoPessoaDTO documento
+) {}
 
-@Data
-public class AtualizaDetentorRequestDTO {
-    private PessoaDTO pessoa;
-    private PessoaLoteDTO pessoaLote;
-    private EnderecoPessoaDTO endereco;
-    private DocumentoPessoaDTO documento;
-}
 

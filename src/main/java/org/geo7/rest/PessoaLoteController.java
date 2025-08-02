@@ -7,7 +7,9 @@ import org.geo7.model.entity.PessoaLote;
 import org.geo7.model.repository.LoteRepository;
 import org.geo7.model.repository.PessoaLoteRepository;
 import org.geo7.model.repository.PessoaRepository;
+import org.geo7.rest.dto.EditarDetentorResponseDTO;
 import org.geo7.rest.dto.PessoaLoteDTO;
+import org.geo7.service.PessoaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,9 @@ public class PessoaLoteController {
 
     @Autowired
     private LoteRepository loteRepository;
+
+    @Autowired
+    private PessoaService pessoaService;
 
     @PostMapping
     public ResponseEntity<PessoaLoteDTO> salvar(@Valid @RequestBody PessoaLoteDTO dto) {
@@ -83,6 +88,14 @@ public class PessoaLoteController {
                     return ResponseEntity.ok(PessoaLoteDTO.fromEntity(atualizado));
                 })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PessoaLote não encontrado"));
+    }
+
+    // GET /api/pessoa-lote/editar/{pessoaLoteId}
+    @GetMapping("/editar/{pessoaLoteId}")
+    public ResponseEntity<EditarDetentorResponseDTO> buscarParaEdicao(@PathVariable Long pessoaLoteId) {
+        return pessoaService.getEditarDetentorData(pessoaLoteId)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Dados de edição não encontrados para PessoaLoteId: " + pessoaLoteId));
     }
 
     @DeleteMapping("{id}")

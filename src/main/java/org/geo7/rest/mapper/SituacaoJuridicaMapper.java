@@ -19,8 +19,9 @@ public class SituacaoJuridicaMapper {
         FormaObtencao forma = entity.getFormaObtencao().stream().findFirst().orElse(null);
         return new SituacaoJuridicaDTO(
                 entity.getId(),
-                forma != null ? forma.getLote().getId() : null,
-                entity.getNome(),
+                //forma != null ? forma.getLote().getId() : null,
+                entity.getNome() != null ? entity.getId() : null,
+                entity.getFormaObtencao() != null ? entity.getFormaObtencao().toString() : null,
                 forma != null ? forma.getDescricaoFormaDeObtencao() : null,
                 forma != null ? forma.getDataPosse() : null,
                 forma != null ? forma.getAreaMedida() : null,
@@ -38,6 +39,7 @@ public class SituacaoJuridicaMapper {
     public static SituacaoJuridica toEntity(SituacaoJuridicaDTO dto, Lote lote) {
         SituacaoJuridica sj = new SituacaoJuridica();
         sj.setNome(dto.situacaoSelecionada());
+
 
         FormaObtencao forma = FormaObtencao.builder()
                 .descricaoFormaDeObtencao(dto.formaObtencaoSelecionada())

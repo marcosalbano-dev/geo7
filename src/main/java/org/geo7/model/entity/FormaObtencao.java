@@ -65,6 +65,7 @@ public class FormaObtencao implements Serializable {
 
     // Validação para `descricaoFormaDeObtencao`
     public void setDescricaoFormaDeObtencao(String descricaoFormaDeObtencao) {
+        System.out.println("Recebendo descrição: " + descricaoFormaDeObtencao);
         if (descricaoFormaDeObtencao != null && !descricaoFormaDeObtencao.isBlank()) {
             if (!DESCRICOES_VALIDAS.contains(descricaoFormaDeObtencao)) {
                 throw new IllegalArgumentException("Descrição inválida");

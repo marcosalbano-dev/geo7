@@ -36,7 +36,7 @@ public record PessoaDTO(
         String racaCor,
 
         // Relacionamentos por ID (opcional, implemente depois se precisar)
-        Set<Long> programasDoGovernoIds, // Exemplo, se quiser retornar IDs dos programas
+        //Set<Long> programasDoGovernoIds, // Exemplo, se quiser retornar IDs dos programas
 
         Set<Long> pronafsIds // Exemplo, se quiser retornar IDs dos pronafs
 ) {
@@ -50,13 +50,13 @@ public record PessoaDTO(
                     .collect(java.util.stream.Collectors.toSet());
         }
 
-        Set<Long> programasIds = null;
-        if (pessoa.getProgramasDoGoverno() != null) {
-            programasIds = pessoa.getProgramasDoGoverno()
-                    .stream()
-                    .map(pg -> pg.getId())
-                    .collect(java.util.stream.Collectors.toSet());
-        }
+//        Set<Long> programasIds = null;
+//        if (pessoa.getProgramasDoGoverno() != null) {
+//            programasIds = pessoa.getProgramasDoGoverno()
+//                    .stream()
+//                    .map(pg -> pg.getId())
+//                    .collect(java.util.stream.Collectors.toSet());
+//        }
         return new PessoaDTO(
                 pessoa.getId(),
                 pessoa.getNome(),
@@ -80,7 +80,7 @@ public record PessoaDTO(
                 pessoa.getQtdPronaf(),
                 pessoa.getValorTotalPronafs(),
                 pessoa.getRacaCor(),
-                programasIds,
+                //programasIds,
                 pronafsIds
         );
     }

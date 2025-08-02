@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PessoaService {
@@ -16,9 +19,10 @@ public class PessoaService {
     @Autowired private PessoaLoteRepository pessoaLoteRepository;
     @Autowired private EnderecoPessoaRepository enderecoPessoaRepository;
     @Autowired private DocumentoPessoaRepository documentoPessoaRepository;
-    @Autowired private ProgramaGovernoRepository programaGovernoRepository;
+    //@Autowired private ProgramaGovernoRepository programaGovernoRepository;
     @Autowired private PronafRepository pronafRepository;
     @Autowired private MunicipioRepository municipioRepository;
+    @Autowired private LoteRepository loteRepository;
 
     public Optional<EditarDetentorResponseDTO> getEditarDetentorData(Long pessoaLoteId) {
         Optional<PessoaLote> pessoaLoteOpt = pessoaLoteRepository.findById(pessoaLoteId);
@@ -29,13 +33,97 @@ public class PessoaService {
         DocumentoPessoa documento = documentoPessoaRepository.findByPessoa(pessoa);
         EnderecoPessoa endereco = enderecoPessoaRepository.findByPessoa(pessoa);
 
+        // Garante que os DTOs de endereço e documento são criados mesmo se as entidades estiverem ausentes
+        EnderecoPessoaDTO enderecoDTO = endereco != null ? EnderecoPessoaDTO.fromEntity(endereco) : null;
+        DocumentoPessoaDTO documentoDTO = documento != null ? DocumentoPessoaDTO.fromEntity(documento) : null;
+
         return Optional.of(new EditarDetentorResponseDTO(
                 PessoaDTO.fromEntity(pessoa),
                 PessoaLoteDTO.fromEntity(pl),
-                EnderecoPessoaDTO.fromEntity(endereco),
-                DocumentoPessoaDTO.fromEntity(documento)
+                enderecoDTO,
+                documentoDTO
         ));
     }
+
+    @Transactional
+    public void salvaDetentor(AtualizaDetentorRequestDTO dto) throws PessoaValidationException {
+        // Cria nova Pessoa a partir do DTO
+        Pessoa pessoa = dto.pessoa().toEntity();
+        // Relacionamentos como programas do governo e pronafs devem ser associados após salvar pessoa
+
+        // Salva Pessoa primeiro para obter o ID
+        pessoa = pessoaRepository.save(pessoa);
+
+        // Programas do Governo
+//        pessoa.getProgramasDoGoverno().clear();
+//        if (dto.pessoa().programasDoGovernoIds() != null) {
+//            for (Long progId : dto.pessoa().programasDoGovernoIds()) {
+//                programaGovernoRepository.findById(progId).ifPresent(pessoa.getProgramasDoGoverno()::add);
+//            }
+//        }
+
+//        if (dto.pessoa().programasDoGovernoIds() != null) {
+//            Set<ProgramaGoverno> programas = new HashSet<>(programaGovernoRepository.findAllById(dto.pessoa().programasDoGovernoIds()));
+//            pessoa.setProgramasDoGoverno(programas);
+//        } else {
+//            pessoa.setProgramasDoGoverno(Collections.emptySet());
+//        }
+
+        // Pronafs
+        pessoa.getPronafs().clear();
+        if (dto.pessoa().pronafsIds() != null) {
+            for (Long pronafId : dto.pessoa().pronafsIds()) {
+                pronafRepository.findById(pronafId).ifPresent(pessoa.getPronafs()::add);
+            }
+        }
+
+        pessoa = pessoaRepository.save(pessoa); // Atualiza as coleções
+
+        // Cria e salva EnderecoPessoa
+        EnderecoPessoa endereco = dto.endereco().toEntity();
+        System.out.println("MUNICIPIO_ID: " + dto.endereco().municipioId());
+
+        endereco.setPessoa(pessoa);
+        if (dto.endereco().municipioId() != null) {
+            municipioRepository.findById(dto.endereco().municipioId())
+                    .ifPresent(endereco::setMunicipio);
+        }
+
+        endereco = enderecoPessoaRepository.save(endereco);
+
+        // Cria e salva DocumentoPessoa
+        DocumentoPessoa documento = dto.documento().toEntity(pessoa, endereco.getMunicipio());
+        documento.setPessoa(pessoa);
+        documento = documentoPessoaRepository.save(documento);
+
+        // Cria PessoaLote (busca o lote pelo id recebido)
+        if (dto.pessoaLote().loteId() == null)
+            throw new PessoaValidationException("Lote obrigatório!");
+
+        Lote lote = loteRepository.findById(dto.pessoaLote().loteId())
+                .orElseThrow(() -> new PessoaValidationException("Lote não encontrado!"));
+
+        PessoaLote pessoaLote = dto.pessoaLote().toEntity(pessoa, lote);
+        pessoaLote.setPessoa(pessoa);
+        pessoaLote.setLote(lote);
+
+        // Validação: percentual de detenção não pode passar de 100%
+        BigDecimal totalPercent = lote.getPessoasLote().stream()
+                .map(pl -> pl.getPercentDetencao() == null ? BigDecimal.ZERO : pl.getPercentDetencao())
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .add(pessoaLote.getPercentDetencao() == null ? BigDecimal.ZERO : pessoaLote.getPercentDetencao());
+
+
+        if (totalPercent.compareTo(new BigDecimal("100.00")) > 0) {
+            throw new PessoaValidationException("Porcentagem de detenção total do imóvel excede 100%. Verifique os detentores.");
+        }
+
+        pessoaLote = pessoaLoteRepository.save(pessoaLote);
+
+        // Tudo pronto!
+    }
+
+
 
     @Transactional
     public void atualizaDetentor(Long pessoaLoteId, AtualizaDetentorRequestDTO dto) throws PessoaValidationException {
@@ -44,48 +132,48 @@ public class PessoaService {
         Pessoa pessoa = pessoaLote.getPessoa();
 
         // Atualiza dados básicos
-        pessoa.setNome(dto.getPessoa().nome());
-        pessoa.setFax(dto.getPessoa().fax());
-        pessoa.setRamal(dto.getPessoa().ramal());
-        pessoa.setEmail(dto.getPessoa().email());
-        pessoa.setNomePai(dto.getPessoa().nomePai());
-        pessoa.setNomeMae(dto.getPessoa().nomeMae());
-        pessoa.setDataNascimento(dto.getPessoa().dataNascimento());
-        pessoa.setSexoPessoa(dto.getPessoa().sexoPessoa());
-        pessoa.setTelefone(dto.getPessoa().telefone());
-        pessoa.setRegimeDeBens(dto.getPessoa().regimeDeBens());
-        pessoa.setDataCasamento(dto.getPessoa().dataCasamento());
-        pessoa.setCodigoPessoaIncra(dto.getPessoa().codigoPessoaIncra());
-        pessoa.setCoordenadaEste(dto.getPessoa().coordenadaEste());
-        pessoa.setCoordenadaNorte(dto.getPessoa().coordenadaNorte());
-        pessoa.setAtividadePrincipal(dto.getPessoa().atividadePrincipal());
-        pessoa.setIsRecebePronaf(dto.getPessoa().isRecebePronaf());
-        pessoa.setIsRecebeAjudoProgramaGoverno(dto.getPessoa().isRecebeAjudoProgramaGoverno());
-        pessoa.setQtdPronaf(dto.getPessoa().qtdPronaf());
-        pessoa.setRacaCor(dto.getPessoa().racaCor());
+        pessoa.setNome(dto.pessoa().nome());
+        pessoa.setFax(dto.pessoa().fax());
+        pessoa.setRamal(dto.pessoa().ramal());
+        pessoa.setEmail(dto.pessoa().email());
+        pessoa.setNomePai(dto.pessoa().nomePai());
+        pessoa.setNomeMae(dto.pessoa().nomeMae());
+        pessoa.setDataNascimento(dto.pessoa().dataNascimento());
+        pessoa.setSexoPessoa(dto.pessoa().sexoPessoa());
+        pessoa.setTelefone(dto.pessoa().telefone());
+        pessoa.setRegimeDeBens(dto.pessoa().regimeDeBens());
+        pessoa.setDataCasamento(dto.pessoa().dataCasamento());
+        pessoa.setCodigoPessoaIncra(dto.pessoa().codigoPessoaIncra());
+        pessoa.setCoordenadaEste(dto.pessoa().coordenadaEste());
+        pessoa.setCoordenadaNorte(dto.pessoa().coordenadaNorte());
+        pessoa.setAtividadePrincipal(dto.pessoa().atividadePrincipal());
+        pessoa.setIsRecebePronaf(dto.pessoa().isRecebePronaf());
+        pessoa.setIsRecebeAjudoProgramaGoverno(dto.pessoa().isRecebeAjudoProgramaGoverno());
+        pessoa.setQtdPronaf(dto.pessoa().qtdPronaf());
+        pessoa.setRacaCor(dto.pessoa().racaCor());
 
         // Programas do Governo
-        pessoa.getProgramasDoGoverno().clear();
-        if (dto.getPessoa().programasDoGovernoIds() != null) {
-            for (Long progId : dto.getPessoa().programasDoGovernoIds()) {
-                programaGovernoRepository.findById(progId).ifPresent(pessoa.getProgramasDoGoverno()::add);
-            }
-        }
+//        pessoa.getProgramasDoGoverno().clear();
+//        if (dto.pessoa().programasDoGovernoIds() != null) {
+//            for (Long progId : dto.pessoa().programasDoGovernoIds()) {
+//                programaGovernoRepository.findById(progId).ifPresent(pessoa.getProgramasDoGoverno()::add);
+//            }
+//        }
 
-        pessoa.setValorTotalPronafs(dto.getPessoa().valorTotalPronafs());
+        pessoa.setValorTotalPronafs(dto.pessoa().valorTotalPronafs());
 
         // Endereço
         EnderecoPessoa endereco = enderecoPessoaRepository.findByPessoa(pessoa);
         if (endereco == null) endereco = new EnderecoPessoa();
         endereco.setPessoa(pessoa);
-        endereco.setLogradouro(dto.getEndereco().logradouro());
-        endereco.setComplemento(dto.getEndereco().complemento());
-        endereco.setNumero(dto.getEndereco().numero());
-        endereco.setBairro(dto.getEndereco().bairro());
-        endereco.setCep(dto.getEndereco().cep());
-        endereco.setCodigoPaisResidencia(dto.getEndereco().codigoPaisResidencia());
-        if (dto.getEndereco().municipioId() != null) {
-            municipioRepository.findById(dto.getEndereco().municipioId())
+        endereco.setLogradouro(dto.endereco().logradouro());
+        endereco.setComplemento(dto.endereco().complemento());
+        endereco.setNumero(dto.endereco().numero());
+        endereco.setBairro(dto.endereco().bairro());
+        endereco.setCep(dto.endereco().cep());
+        endereco.setCodigoPaisResidencia(dto.endereco().codigoPaisResidencia());
+        if (dto.endereco().municipioId() != null) {
+            municipioRepository.findById(dto.endereco().municipioId())
                     .ifPresent(endereco::setMunicipio);
         }
 
@@ -93,50 +181,50 @@ public class PessoaService {
         DocumentoPessoa documento = documentoPessoaRepository.findByPessoa(pessoa);
         if (documento == null) documento = new DocumentoPessoa();
         documento.setPessoa(pessoa);
-        documento.setTipoDocumentoIdentificacao(dto.getDocumento().tipoDocumentoIdentificacao());
-        documento.setNumeroDocumentoIdentificacao(dto.getDocumento().numeroDocumentoIdentificacao());
-        documento.setOrgaoEmissor(dto.getDocumento().orgaoEmissor());
-        documento.setUfOrgaoEmissor(dto.getDocumento().ufOrgaoEmissor());
-        documento.setTipoNacionalidade(dto.getDocumento().tipoNacionalidade());
-        documento.setCpf(dto.getDocumento().cpf());
-        documento.setCnpj(dto.getDocumento().cnpj());
-        documento.setEstadoCivil(dto.getDocumento().estadoCivil());
-        documento.setTipoPessoa(dto.getDocumento().tipoPessoa());
-        documento.setNaturezaJuridica(dto.getDocumento().naturezaJuridica());
-        documento.setCapitalNacional(dto.getDocumento().capitalNacional());
-        documento.setCapitalEstrangeiro(dto.getDocumento().capitalEstrangeiro());
-        documento.setRegistroJuntaComercial(dto.getDocumento().registroJuntaComercial());
-        documento.setNomeFantasia(dto.getDocumento().nomeFantasia());
-        documento.setCodigoPaisSede(dto.getDocumento().codigoPaisSede());
-        documento.setUfPaisSede(dto.getDocumento().ufPaisSede());
-        documento.setTipoDocumentoRepresentanteLegal(dto.getDocumento().tipoDocumentoRepresentanteLegal());
-        documento.setNumeroDocumentoRepresentanteLegal(dto.getDocumento().numeroDocumentoRepresentanteLegal());
-        documento.setTipoDePoder(dto.getDocumento().tipoDePoder());
-        documento.setTipoDeGoverno(dto.getDocumento().tipoDeGoverno());
-        documento.setPercentCapitalNacional(dto.getDocumento().percentCapitalNacional());
-        documento.setPercentCapitalEstrangeiro(dto.getDocumento().percentCapitalEstrangeiro());
-        documento.setPcePais(dto.getDocumento().pcePais());
-        documento.setPcePercentCapital(dto.getDocumento().pcePercentCapital());
-        documento.setObsevacoesQuadro7(dto.getDocumento().obsevacoesQuadro7());
+        documento.setTipoDocumentoIdentificacao(dto.documento().tipoDocumentoIdentificacao());
+        documento.setNumeroDocumentoIdentificacao(dto.documento().numeroDocumentoIdentificacao());
+        documento.setOrgaoEmissor(dto.documento().orgaoEmissor());
+        documento.setUfOrgaoEmissor(dto.documento().ufOrgaoEmissor());
+        documento.setTipoNacionalidade(dto.documento().tipoNacionalidade());
+        documento.setCpf(dto.documento().cpf());
+        documento.setCnpj(dto.documento().cnpj());
+        documento.setEstadoCivil(dto.documento().estadoCivil());
+        documento.setTipoPessoa(dto.documento().tipoPessoa());
+        documento.setNaturezaJuridica(dto.documento().naturezaJuridica());
+        documento.setCapitalNacional(dto.documento().capitalNacional());
+        documento.setCapitalEstrangeiro(dto.documento().capitalEstrangeiro());
+        documento.setRegistroJuntaComercial(dto.documento().registroJuntaComercial());
+        documento.setNomeFantasia(dto.documento().nomeFantasia());
+        documento.setCodigoPaisSede(dto.documento().codigoPaisSede());
+        documento.setUfPaisSede(dto.documento().ufPaisSede());
+        documento.setTipoDocumentoRepresentanteLegal(dto.documento().tipoDocumentoRepresentanteLegal());
+        documento.setNumeroDocumentoRepresentanteLegal(dto.documento().numeroDocumentoRepresentanteLegal());
+        documento.setTipoDePoder(dto.documento().tipoDePoder());
+        documento.setTipoDeGoverno(dto.documento().tipoDeGoverno());
+        documento.setPercentCapitalNacional(dto.documento().percentCapitalNacional());
+        documento.setPercentCapitalEstrangeiro(dto.documento().percentCapitalEstrangeiro());
+        documento.setPcePais(dto.documento().pcePais());
+        documento.setPcePercentCapital(dto.documento().pcePercentCapital());
+        documento.setObsevacoesQuadro7(dto.documento().obsevacoesQuadro7());
 
         // Atualiza PessoaLote
-        pessoaLote.setCodigoImovelRural(dto.getPessoaLote().codigoImovelRural());
-        pessoaLote.setCondicaoPessoaImovelRural(dto.getPessoaLote().condicaoPessoaImovelRural());
-        pessoaLote.setTipoDoAto(dto.getPessoaLote().tipoDoAto());
-        pessoaLote.setNumeroAto(dto.getPessoaLote().numeroAto());
-        pessoaLote.setDataAto(dto.getPessoaLote().dataAto());
-        pessoaLote.setPercentDetencao(dto.getPessoaLote().percentDetencao());
-        pessoaLote.setQuantidadeAreaCedida(dto.getPessoaLote().quantidadeAreaCedida());
-        pessoaLote.setAtividadePrincipalExploracao(dto.getPessoaLote().atividadePrincipalExploracao());
-        pessoaLote.setContrato(dto.getPessoaLote().contrato());
-        pessoaLote.setDataTerminoContrato(dto.getPessoaLote().dataTerminoContrato());
-        pessoaLote.setIsResideNoImovel(dto.getPessoaLote().isResideNoImovel());
-        pessoaLote.setIsDeclarante(dto.getPessoaLote().isDeclarante());
-        pessoaLote.setIsContratoPrazoIndeterminado(dto.getPessoaLote().isContratoPrazoIndeterminado());
+        pessoaLote.setCodigoImovelRural(dto.pessoaLote().codigoImovelRural());
+        pessoaLote.setCondicaoPessoaImovelRural(dto.pessoaLote().condicaoPessoaImovelRural());
+        pessoaLote.setTipoDoAto(dto.pessoaLote().tipoDoAto());
+        pessoaLote.setNumeroAto(dto.pessoaLote().numeroAto());
+        pessoaLote.setDataAto(dto.pessoaLote().dataAto());
+        pessoaLote.setPercentDetencao(dto.pessoaLote().percentDetencao());
+        pessoaLote.setQuantidadeAreaCedida(dto.pessoaLote().quantidadeAreaCedida());
+        pessoaLote.setAtividadePrincipalExploracao(dto.pessoaLote().atividadePrincipalExploracao());
+        pessoaLote.setContrato(dto.pessoaLote().contrato());
+        pessoaLote.setDataTerminoContrato(dto.pessoaLote().dataTerminoContrato());
+        pessoaLote.setIsResideNoImovel(dto.pessoaLote().isResideNoImovel());
+        pessoaLote.setIsDeclarante(dto.pessoaLote().isDeclarante());
+        pessoaLote.setIsContratoPrazoIndeterminado(dto.pessoaLote().isContratoPrazoIndeterminado());
 
         // Validação: percentual de detenção não pode passar de 100%
         BigDecimal percentDetencaoTotal = pessoaLote.getLote().getPessoasLote().stream()
-                .map(pl -> pl.equals(pessoaLote) ? dto.getPessoaLote().percentDetencao() : pl.getPercentDetencao())
+                .map(pl -> pl.equals(pessoaLote) ? dto.pessoaLote().percentDetencao() : pl.getPercentDetencao())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         if (percentDetencaoTotal.compareTo(new BigDecimal("100.00")) > 0) {
             throw new PessoaValidationException("Porcentagem de detenção total do imóvel excede 100%. Verifique os detentores.");
@@ -150,10 +238,11 @@ public class PessoaService {
 
         // Pronafs
         pessoa.getPronafs().clear();
-        if (dto.getPessoa().pronafsIds() != null) {
-            for (Long pronafId : dto.getPessoa().pronafsIds()) {
+        if (dto.pessoa().pronafsIds() != null) {
+            for (Long pronafId : dto.pessoa().pronafsIds()) {
                 pronafRepository.findById(pronafId).ifPresent(pessoa.getPronafs()::add);
             }
         }
     }
+
 }

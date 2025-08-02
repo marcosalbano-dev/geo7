@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface SituacaoJuridicaRepository extends JpaRepository<SituacaoJuridica, Long> {
 
     Optional<SituacaoJuridica> findByNome(String nome);
+
 }

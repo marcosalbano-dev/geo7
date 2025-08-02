@@ -13,6 +13,8 @@ import java.util.Optional;
 public record EstruturaDTO(
         Long id,
         Long loteId,
+        Long formaObtencaoId,
+        String descricaoFormaDeObtencao,
         Date dhc,
         Date dhm,
         Integer familiasResidentes,
@@ -28,7 +30,7 @@ public record EstruturaDTO(
         String litigio,
         Boolean entregouMemorialPlanilha,
         String destinacaoDoImovel,
-        String pontoDeReferencia,
+        //String pontoDeReferencia,
         Integer numeroHerdeiros,
         Double porcentagemDetencao,
         String obsLitigio,
@@ -53,7 +55,6 @@ public record EstruturaDTO(
         Boolean isPossuiElergiaEletrica,
         Boolean isPossuiEnergiaAlternativa,
         Boolean isRedeDeAbastecimento,
-        String formaObtencaoSelecionada,
         String oficio,
         String matricula,
         String livro,
@@ -65,7 +66,8 @@ public record EstruturaDTO(
         String municipioCartorio,
         Integer numeroHerdeirosForma,
         String dataPosse,
-        String situacaoSelecionada,
+        //String formaObtencaoSelecionada,
+        //String situacaoSelecionada,
         Long situacaoJuridicaId,
 
         // CAMPOS DO LOTE
@@ -78,10 +80,10 @@ public record EstruturaDTO(
         Long distritoId
 
 ) {
-    public static EstruturaDTO fromEntity(Estrutura estrutura) {
+    public static EstruturaDTO fromEntity(Estrutura estrutura, FormaObtencao forma) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        FormaObtencao forma = Optional.ofNullable(estrutura.getLote())
+        FormaObtencao formaObtencao = Optional.ofNullable(estrutura.getLote())
                 .map(Lote::getFormaObtencao)
                 .flatMap(set -> set.stream().findFirst())
                 .orElse(null);
@@ -112,6 +114,8 @@ public record EstruturaDTO(
         return new EstruturaDTO(
                 estrutura.getId(),
                 estrutura.getLote() != null ? estrutura.getLote().getId() : null,
+                forma != null ? forma.getId() : null,
+                forma != null ? forma.getDescricaoFormaDeObtencao() : null, // descricao
                 estrutura.getDhc(),
                 estrutura.getDhm(),
                 estrutura.getFamiliasResidentes(),
@@ -127,7 +131,7 @@ public record EstruturaDTO(
                 estrutura.getLitigio(),
                 estrutura.getEntregouMemorialPlanilha(),
                 estrutura.getDestinacaoDoImovel(),
-                estrutura.getPontoDeReferencia(),
+                //estrutura.getPontoDeReferencia(),
                 estrutura.getNumeroHerdeiros(),
                 estrutura.getPorcentagemDetencao(),
                 estrutura.getObsLitigio(),
@@ -152,7 +156,6 @@ public record EstruturaDTO(
                 estrutura.getIsPossuiElergiaEletrica(),
                 estrutura.getIsPossuiEnergiaAlternativa(),
                 estrutura.getIsRedeDeAbastecimento(),
-                forma != null ? forma.getDescricaoFormaDeObtencao() : null,
                 forma != null ? forma.getOficio() : null,
                 forma != null ? forma.getMatricula() : null,
                 forma != null ? forma.getLivro() : null,
@@ -164,7 +167,8 @@ public record EstruturaDTO(
                 forma != null ? forma.getMunicipioCartorio() : null,
                 forma != null ? forma.getNumeroHerdeiros() : null,
                 dataPosseFormatada, // Usando a variável segura
-                situacao != null ? situacao.getNome() : null,
+                //forma != null ? forma.getDescricaoFormaDeObtencao() : null,
+                //situacao != null ? situacao.getNome() : null,
                 situacao != null ? situacao.getId() : null,
                 estrutura.getLote() != null ? estrutura.getLote().getNumero() : null,
                 estrutura.getLote() != null ? estrutura.getLote().getSncr() : null,
@@ -177,7 +181,7 @@ public record EstruturaDTO(
         );
     }
 
-    public Estrutura toEntity(Lote lote, SituacaoJuridica situacaoJuridica) {
+    public Estrutura toEntity(Lote lote, SituacaoJuridica situacaoJuridica, FormaObtencao forma) {
         BigDecimal areaRegistradaValue = null;
         BigDecimal areaMedidaValue = null;
         Date dataPosseDate = null;
@@ -200,8 +204,8 @@ public record EstruturaDTO(
             throw new IllegalArgumentException("Erro ao converter valores para BigDecimal ou Date", e);
         }
 
-        FormaObtencao forma = FormaObtencao.builder()
-                .descricaoFormaDeObtencao(formaObtencaoSelecionada)
+        FormaObtencao formaObtencao = FormaObtencao.builder()
+                .descricaoFormaDeObtencao(descricaoFormaDeObtencao)
                 .oficio(oficio)
                 .matricula(matricula)
                 .livro(livro)
@@ -235,7 +239,7 @@ public record EstruturaDTO(
         estrutura.setLitigio(litigio);
         estrutura.setEntregouMemorialPlanilha(entregouMemorialPlanilha);
         estrutura.setDestinacaoDoImovel(destinacaoDoImovel);
-        estrutura.setPontoDeReferencia(pontoDeReferencia);
+        //estrutura.setPontoDeReferencia(pontoDeReferencia);
         estrutura.setNumeroHerdeiros(numeroHerdeiros);
         estrutura.setObsLitigio(obsLitigio);
         estrutura.setPorcentagemDetencao(porcentagemDetencao);
@@ -262,6 +266,7 @@ public record EstruturaDTO(
         estrutura.setUsoDaguaRioOuRiacho(usoDaguaRioOuRiacho);
 
         // associar forma obtencao se necessário externamente
+        forma.setDescricaoFormaDeObtencao(formaObtencao.getDescricaoFormaDeObtencao());
         return estrutura;
     }
 }
