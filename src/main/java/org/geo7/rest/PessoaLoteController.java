@@ -107,4 +107,12 @@ public class PessoaLoteController {
                 })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PessoaLote não encontrado"));
     }
+
+    @GetMapping("/editar/por-lote/{loteId}")
+    public ResponseEntity<EditarDetentorResponseDTO> editarPorLote(@PathVariable Long loteId) {
+        return pessoaService.getEditarDetentorPorLote(loteId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }

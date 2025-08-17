@@ -7,6 +7,7 @@ import org.geo7.model.entity.Pronaf;
 import org.geo7.model.repository.PessoaRepository;
 //import org.geo7.model.repository.ProgramaGovernoRepository;
 import org.geo7.rest.dto.AtualizaDetentorRequestDTO;
+import org.geo7.rest.dto.EditarDetentorResponseDTO;
 import org.geo7.rest.dto.PessoaDTO;
 import org.geo7.rest.dto.PronafDTO;
 import org.geo7.service.PessoaService;
@@ -72,8 +73,9 @@ public class PessoaController {
     @PostMapping
     public ResponseEntity<PessoaDTO> criarPessoaDetentor(@RequestBody AtualizaDetentorRequestDTO dto) {
         try {
-            pessoaService.salvaDetentor(dto); // Você pode criar este método parecido com o atualizaDetentor
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(pessoaService.salvaDetentor(dto));
+//            PessoaDTO pessoaSalva = pessoaService.salvaDetentor(dto);
+//            return ResponseEntity.ok(pessoaSalva);
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(
@@ -83,32 +85,27 @@ public class PessoaController {
 
     }
 
+    @GetMapping("/editar/{pessoaLoteId}")
+    public ResponseEntity<EditarDetentorResponseDTO> buscarParaEdicao(@PathVariable Long pessoaLoteId) {
+        return pessoaService.getEditarDetentorData(pessoaLoteId)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "PessoaLote não encontrado: " + pessoaLoteId));
+    }
+
+
     @PutMapping("/{pessoaLoteId}")
-    public ResponseEntity<PessoaDTO> atualizarPessoaDetentor(
+    public ResponseEntity<EditarDetentorResponseDTO> atualizarPessoaDetentor(
             @PathVariable Long pessoaLoteId,
             @RequestBody AtualizaDetentorRequestDTO dto) {
         try {
-            pessoaService.atualizaDetentor(pessoaLoteId, dto);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(pessoaService.atualizaDetentor(pessoaLoteId, dto));
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(
                     org.springframework.http.HttpStatus.BAD_REQUEST, "Erro ao atualizar detentor: " + e.getMessage());
         }
     }
-
-//    @PutMapping("/{id}")
-//    public ResponseEntity<PessoaDTO> atualizar(@PathVariable Long id, @Valid @RequestBody PessoaDTO dto) {
-//        return pessoaRepository.findById(id)
-//                .map(existing -> {
-//                    Pessoa updated = dto.toEntity();
-//                    updated.setId(id);
-//                    updated = pessoaRepository.save(updated);
-//                    return ResponseEntity.ok(PessoaDTO.fromEntity(updated));
-//                })
-//                .orElseThrow(() -> new ResponseStatusException(
-//                        HttpStatus.NOT_FOUND, "Pessoa não encontrada com id: " + id));
-//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<PessoaDTO> delete(@PathVariable Long id) {
@@ -118,4 +115,12 @@ public class PessoaController {
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada com id: " + id);
     }
+
+    @GetMapping("/editar/por-lote/{loteId}")
+    public ResponseEntity<EditarDetentorResponseDTO> editarPorLote(@PathVariable Long loteId) {
+        return pessoaService.getEditarDetentorPorLote(loteId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }

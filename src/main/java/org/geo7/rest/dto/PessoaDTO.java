@@ -4,6 +4,7 @@ import org.geo7.model.entity.Pessoa;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public record PessoaDTO(
         Long id,
@@ -14,6 +15,7 @@ public record PessoaDTO(
         String email,
         String nomePai,
         String nomeMae,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         Date dataNascimento,
         String sexoPessoa,
         Boolean isEspolio,
@@ -34,9 +36,6 @@ public record PessoaDTO(
         BigDecimal valorTotalPronafs,
 
         String racaCor,
-
-        // Relacionamentos por ID (opcional, implemente depois se precisar)
-        //Set<Long> programasDoGovernoIds, // Exemplo, se quiser retornar IDs dos programas
 
         Set<Long> pronafsIds // Exemplo, se quiser retornar IDs dos pronafs
 ) {

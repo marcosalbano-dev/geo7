@@ -82,40 +82,29 @@ public record EstruturaDTO(
 ) {
     public static EstruturaDTO fromEntity(Estrutura estrutura, FormaObtencao forma) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String dataRegistroFmt = forma != null ? formatarData(forma.getDataRegistro()) : null;
+        String dataPosseFmt    = forma != null ? formatarData(forma.getDataPosse())    : null;
 
-        FormaObtencao formaObtencao = Optional.ofNullable(estrutura.getLote())
-                .map(Lote::getFormaObtencao)
-                .flatMap(set -> set.stream().findFirst())
-                .orElse(null);
+//        FormaObtencao formaObtencao = Optional.ofNullable(estrutura.getLote())
+//                .map(Lote::getFormaObtencao)
+//                .flatMap(set -> set.stream().findFirst())
+//                .orElse(null);
 
         SituacaoJuridica situacao = forma != null ? forma.getSituacaoJuridica() : null;
 
-        // ⚠️ Ajuste de datas
-        String dataRegistroFormatada = null;
-        if (forma != null && forma.getDataRegistro() != null) {
-            Object dr = forma.getDataRegistro();
-            if (dr instanceof Date) {
-                dataRegistroFormatada = sdf.format((Date) dr);
-            } else {
-                dataRegistroFormatada = dr.toString();
-            }
-        }
-
-        String dataPosseFormatada = null;
-        if (forma != null && forma.getDataPosse() != null) {
-            Object dp = forma.getDataPosse();
-            if (dp instanceof Date) {
-                dataPosseFormatada = sdf.format((Date) dp);
-            } else {
-                dataPosseFormatada = dp.toString();
-            }
-        }
+//        String dataRegistroFormatada = (forma != null && forma.getDataRegistro() != null)
+//                ? sdf.format(forma.getDataRegistro()) : null;
+//
+//        String dataPosseFormatada = (forma != null && forma.getDataPosse() != null)
+//                ? sdf.format(forma.getDataPosse()) : null;
 
         return new EstruturaDTO(
                 estrutura.getId(),
                 estrutura.getLote() != null ? estrutura.getLote().getId() : null,
+                /* forma de obtenção */
                 forma != null ? forma.getId() : null,
-                forma != null ? forma.getDescricaoFormaDeObtencao() : null, // descricao
+                forma != null ? forma.getDescricaoFormaDeObtencao() : null,
+
                 estrutura.getDhc(),
                 estrutura.getDhm(),
                 estrutura.getFamiliasResidentes(),
@@ -131,7 +120,6 @@ public record EstruturaDTO(
                 estrutura.getLitigio(),
                 estrutura.getEntregouMemorialPlanilha(),
                 estrutura.getDestinacaoDoImovel(),
-                //estrutura.getPontoDeReferencia(),
                 estrutura.getNumeroHerdeiros(),
                 estrutura.getPorcentagemDetencao(),
                 estrutura.getObsLitigio(),
@@ -160,15 +148,14 @@ public record EstruturaDTO(
                 forma != null ? forma.getMatricula() : null,
                 forma != null ? forma.getLivro() : null,
                 forma != null ? forma.getNomeCartorio() : null,
-                dataRegistroFormatada,  // Usando a variável segura
+                dataRegistroFmt,
                 forma != null ? forma.getNumeroRegistro() : null,
                 forma != null && forma.getAreaRegistrada() != null ? forma.getAreaRegistrada().toPlainString() : null,
                 forma != null && forma.getAreaMedida() != null ? forma.getAreaMedida().toPlainString() : null,
                 forma != null ? forma.getMunicipioCartorio() : null,
                 forma != null ? forma.getNumeroHerdeiros() : null,
-                dataPosseFormatada, // Usando a variável segura
-                //forma != null ? forma.getDescricaoFormaDeObtencao() : null,
-                //situacao != null ? situacao.getNome() : null,
+                dataPosseFmt,
+
                 situacao != null ? situacao.getId() : null,
                 estrutura.getLote() != null ? estrutura.getLote().getNumero() : null,
                 estrutura.getLote() != null ? estrutura.getLote().getSncr() : null,
@@ -268,5 +255,25 @@ public record EstruturaDTO(
         // associar forma obtencao se necessário externamente
         forma.setDescricaoFormaDeObtencao(formaObtencao.getDescricaoFormaDeObtencao());
         return estrutura;
+    }
+
+    private static String formatarData(Object v) {
+        if (v == null) return null;
+        if (v instanceof java.util.Date d) {
+            return new java.text.SimpleDateFormat("yyyy-MM-dd").format(d);
+        }
+        // Se for String (coluna varchar), normalize se possível; senão devolva como veio
+        String s = v.toString().trim();
+        if (s.isEmpty() || "null".equalsIgnoreCase(s)) return null;
+
+        // tenta parsear alguns formatos comuns; se falhar, devolve original
+        String[] patterns = {"yyyy-MM-dd", "dd/MM/yyyy", "yyyy-MM-dd HH:mm:ss", "EEE MMM dd HH:mm:ss zzz yyyy"};
+        for (String p : patterns) {
+            try {
+                var d = new java.text.SimpleDateFormat(p, java.util.Locale.ENGLISH).parse(s);
+                return new java.text.SimpleDateFormat("yyyy-MM-dd").format(d);
+            } catch (Exception ignore) {}
+        }
+        return s; // mantém como está
     }
 }

@@ -1,5 +1,6 @@
 package org.geo7.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.geo7.model.entity.Lote;
 import org.geo7.model.entity.Pessoa;
 import org.geo7.model.entity.PessoaLote;
@@ -20,10 +21,12 @@ public record PessoaLoteDTO(
         Boolean isResideNoImovel,
         String tipoDoAto,
         Double numeroAto,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         Date dataAto,
         BigDecimal quantidadeAreaCedida,
         String atividadePrincipalExploracao,
         String contrato,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         Date dataTerminoContrato,
         Boolean isContratoPrazoIndeterminado
 ) {

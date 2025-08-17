@@ -3,6 +3,7 @@ package org.geo7.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(name = "documentos_pessoa", schema = "geo7")
@@ -114,5 +115,19 @@ public class DocumentoPessoa implements Serializable {
     public String toString() {
         return tipoDocumentoIdentificacao;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocumentoPessoa documentoPessoa = (DocumentoPessoa) o;
+        return id != null && id.equals(documentoPessoa.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }
 

@@ -1,5 +1,6 @@
 package org.geo7.service;
 
+import lombok.RequiredArgsConstructor;
 import org.geo7.model.entity.*;
 import org.geo7.model.repository.*;
 import org.geo7.rest.dto.*;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class PessoaService {
 
     @Autowired private PessoaRepository pessoaRepository;
@@ -44,91 +46,149 @@ public class PessoaService {
                 documentoDTO
         ));
     }
-
-    @Transactional
-    public void salvaDetentor(AtualizaDetentorRequestDTO dto) throws PessoaValidationException {
-        // Cria nova Pessoa a partir do DTO
-        Pessoa pessoa = dto.pessoa().toEntity();
-        // Relacionamentos como programas do governo e pronafs devem ser associados após salvar pessoa
-
-        // Salva Pessoa primeiro para obter o ID
-        pessoa = pessoaRepository.save(pessoa);
-
-        // Programas do Governo
-//        pessoa.getProgramasDoGoverno().clear();
-//        if (dto.pessoa().programasDoGovernoIds() != null) {
-//            for (Long progId : dto.pessoa().programasDoGovernoIds()) {
-//                programaGovernoRepository.findById(progId).ifPresent(pessoa.getProgramasDoGoverno()::add);
-//            }
-//        }
-
-//        if (dto.pessoa().programasDoGovernoIds() != null) {
-//            Set<ProgramaGoverno> programas = new HashSet<>(programaGovernoRepository.findAllById(dto.pessoa().programasDoGovernoIds()));
-//            pessoa.setProgramasDoGoverno(programas);
-//        } else {
-//            pessoa.setProgramasDoGoverno(Collections.emptySet());
-//        }
-
-        // Pronafs
-        pessoa.getPronafs().clear();
-        if (dto.pessoa().pronafsIds() != null) {
-            for (Long pronafId : dto.pessoa().pronafsIds()) {
-                pronafRepository.findById(pronafId).ifPresent(pessoa.getPronafs()::add);
-            }
-        }
-
-        pessoa = pessoaRepository.save(pessoa); // Atualiza as coleções
-
-        // Cria e salva EnderecoPessoa
-        EnderecoPessoa endereco = dto.endereco().toEntity();
-        System.out.println("MUNICIPIO_ID: " + dto.endereco().municipioId());
-
-        endereco.setPessoa(pessoa);
-        if (dto.endereco().municipioId() != null) {
-            municipioRepository.findById(dto.endereco().municipioId())
-                    .ifPresent(endereco::setMunicipio);
-        }
-
-        endereco = enderecoPessoaRepository.save(endereco);
-
-        // Cria e salva DocumentoPessoa
-        DocumentoPessoa documento = dto.documento().toEntity(pessoa, endereco.getMunicipio());
-        documento.setPessoa(pessoa);
-        documento = documentoPessoaRepository.save(documento);
-
-        // Cria PessoaLote (busca o lote pelo id recebido)
-        if (dto.pessoaLote().loteId() == null)
-            throw new PessoaValidationException("Lote obrigatório!");
-
-        Lote lote = loteRepository.findById(dto.pessoaLote().loteId())
-                .orElseThrow(() -> new PessoaValidationException("Lote não encontrado!"));
-
-        PessoaLote pessoaLote = dto.pessoaLote().toEntity(pessoa, lote);
-        pessoaLote.setPessoa(pessoa);
-        pessoaLote.setLote(lote);
-
-        // Validação: percentual de detenção não pode passar de 100%
-        BigDecimal totalPercent = lote.getPessoasLote().stream()
-                .map(pl -> pl.getPercentDetencao() == null ? BigDecimal.ZERO : pl.getPercentDetencao())
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .add(pessoaLote.getPercentDetencao() == null ? BigDecimal.ZERO : pessoaLote.getPercentDetencao());
-
-
-        if (totalPercent.compareTo(new BigDecimal("100.00")) > 0) {
-            throw new PessoaValidationException("Porcentagem de detenção total do imóvel excede 100%. Verifique os detentores.");
-        }
-
-        pessoaLote = pessoaLoteRepository.save(pessoaLote);
-
-        // Tudo pronto!
+    public Optional<EditarDetentorResponseDTO> getEditarDetentorPorLote(Long loteId) {
+        return pessoaLoteRepository.findTopByLote_IdOrderByIdDesc(loteId).map(pl -> {
+            Pessoa p = pl.getPessoa();
+            DocumentoPessoa doc = documentoPessoaRepository.findByPessoa(p);
+            EnderecoPessoa end = enderecoPessoaRepository.findByPessoa(p);
+            return new EditarDetentorResponseDTO(
+                    PessoaDTO.fromEntity(p),
+                    PessoaLoteDTO.fromEntity(pl),
+                    end != null ? EnderecoPessoaDTO.fromEntity(end) : null,
+                    doc != null ? DocumentoPessoaDTO.fromEntity(doc) : null
+            );
+        });
     }
 
 
+//    @Transactional
+//    public PessoaDTO salvaDetentor(AtualizaDetentorRequestDTO dto) {
+//        // 1) Pessoa
+//        Pessoa pessoa = pessoaRepository.save(dto.pessoa().toEntity());
+//
+//        // 2) PessoaLote (vínculo)
+//        if (dto.pessoaLote() != null && dto.pessoaLote().loteId() != null) {
+//            Lote lote = loteRepository.findById(dto.pessoaLote().loteId())
+//                    .orElseThrow(() -> new IllegalArgumentException("Lote não encontrado: " + dto.pessoaLote().loteId()));
+//            PessoaLote pl = dto.pessoaLote().toEntity(pessoa, lote);
+//
+//            // Se quiser evitar duplicados por (pessoa,lote):
+//            Optional<PessoaLote> existente = pessoaLoteRepository.findByPessoaIdAndLoteId(pessoa.getId(), lote.getId());
+//            if (existente.isPresent()) {
+//                pl.setId(existente.get().getId());
+//            }
+//            pessoaLoteRepository.save(pl);
+//        }
+//
+//        // 3) Endereço da pessoa
+//        if (dto.endereco() != null) {
+//            EnderecoPessoa endereco = dto.endereco().toEntity();
+//            endereco.setPessoa(pessoa);
+//            if (dto.endereco().municipioId() != null) {
+//                Municipio m = municipioRepository.getReferenceById(dto.endereco().municipioId());
+//                endereco.setMunicipio(m);
+//            }
+//            // upsert
+//            if (endereco.getId() == null) {
+//                // Se existe, reaproveite o ID
+//                enderecoPessoaRepository.findFirstByPessoaId(pessoa.getId()).ifPresent(e -> endereco.setId(e.getId()));
+//            }
+//            enderecoPessoaRepository.save(endereco);
+//        }
+//
+//        // 4) DocumentoPessoa (AQUI estava faltando na maioria dos casos)
+//        if (dto.documento() != null) {
+//            DocumentoPessoaDTO docDTO = dto.documento();
+//            Municipio naturalidade = null;
+//            if (docDTO.naturalidadeId() != null) {
+//                naturalidade = municipioRepository.getReferenceById(docDTO.naturalidadeId());
+//            }
+//
+//            DocumentoPessoa doc = docDTO.toEntity(pessoa, naturalidade);
+//
+//            // upsert por pessoa_id (se houver unicidade por pessoa)
+//            documentoPessoaRepository.findFirstByPessoaId(pessoa.getId()).ifPresent(existente -> doc.setId(existente.getId()));
+//            System.out.println("Documento DTO recebido: {}: " + dto.documento());
+//            System.out.println("Documento entidade antes de salvar: {}" + doc);
+//            documentoPessoaRepository.save(doc);
+//        }
+//
+//        // 5) Retorno
+//        return PessoaDTO.fromEntity(pessoa);
+//    }
 
     @Transactional
-    public void atualizaDetentor(Long pessoaLoteId, AtualizaDetentorRequestDTO dto) throws PessoaValidationException {
+    public PessoaDTO salvaDetentor(AtualizaDetentorRequestDTO dto) {
+        // igual ao que te enviei antes (criação)
+        Pessoa pessoa = pessoaRepository.save(dto.pessoa().toEntity());
+        upsertVinculoEnderecoDocumento(pessoa, dto);
+        return PessoaDTO.fromEntity(pessoa);
+    }
+
+//    @Transactional
+//    public PessoaDTO atualizaDetentor(Long pessoaLoteId, AtualizaDetentorRequestDTO dto) {
+//        // 1) pega o vínculo existente
+//        PessoaLote vinculo = pessoaLoteRepository.findById(pessoaLoteId)
+//                .orElseThrow(() -> new IllegalArgumentException("PessoaLote não encontrado: " + pessoaLoteId));
+//
+//        // 2) atualiza Pessoa (conserva o id original)
+//        Pessoa pessoaAtual = vinculo.getPessoa();
+//        Pessoa nova = dto.pessoa().toEntity();
+//        nova.setId(pessoaAtual.getId());
+//        Pessoa pessoa = pessoaRepository.save(nova);
+//
+//        // 3) (re)salva vínculo usando o lote da DTO (se veio), senão mantém
+//        Lote lote = vinculo.getLote();
+//        if (dto.pessoaLote() != null && dto.pessoaLote().loteId() != null) {
+//            Long loteId = dto.pessoaLote().loteId();
+//            lote = loteRepository.findById(loteId)
+//                    .orElseThrow(() -> new IllegalArgumentException("Lote não encontrado: " + loteId));
+//        }
+//        PessoaLote novoVinculo = (dto.pessoaLote() != null)
+//                ? dto.pessoaLote().toEntity(pessoa, lote)
+//                : PessoaLote.builder().pessoa(pessoa).lote(lote).build();
+//        novoVinculo.setId(vinculo.getId()); // mantém o mesmo vínculo
+//        pessoaLoteRepository.save(novoVinculo);
+//
+//        // 4) endereço + documento (upsert por pessoa)
+//        upsertVinculoEnderecoDocumento(pessoa, dto);
+//
+//        return PessoaDTO.fromEntity(pessoa);
+//    }
+
+    private void upsertVinculoEnderecoDocumento(Pessoa pessoa, AtualizaDetentorRequestDTO dto) {
+
+        // Endereço
+        if (dto.endereco() != null) {
+            EnderecoPessoa endereco = dto.endereco().toEntity();
+            endereco.setPessoa(pessoa);
+            if (dto.endereco().municipioId() != null) {
+                endereco.setMunicipio(municipioRepository.getReferenceById(dto.endereco().municipioId()));
+            }
+            enderecoPessoaRepository.findFirstByPessoaId(pessoa.getId()).ifPresent(ex -> endereco.setId(ex.getId()));
+            enderecoPessoaRepository.save(endereco);
+        }
+
+        // Documento
+        if (dto.documento() != null) {
+            DocumentoPessoaDTO d = dto.documento();
+            Municipio naturalidade = (d.naturalidadeId() != null)
+                    ? municipioRepository.getReferenceById(d.naturalidadeId()) : null;
+
+            DocumentoPessoa doc = d.toEntity(pessoa, naturalidade);
+            documentoPessoaRepository.findFirstByPessoaId(pessoa.getId()).ifPresent(ex -> doc.setId(ex.getId()));
+            documentoPessoaRepository.save(doc);
+        }
+    }
+
+
+    @Transactional
+    public EditarDetentorResponseDTO atualizaDetentor(Long pessoaLoteId, AtualizaDetentorRequestDTO dto)
+            throws PessoaValidationException {
+
         PessoaLote pessoaLote = pessoaLoteRepository.findById(pessoaLoteId)
                 .orElseThrow(() -> new PessoaValidationException("PessoaLote não encontrada!"));
+
         Pessoa pessoa = pessoaLote.getPessoa();
 
         // Atualiza dados básicos
@@ -151,16 +211,8 @@ public class PessoaService {
         pessoa.setIsRecebeAjudoProgramaGoverno(dto.pessoa().isRecebeAjudoProgramaGoverno());
         pessoa.setQtdPronaf(dto.pessoa().qtdPronaf());
         pessoa.setRacaCor(dto.pessoa().racaCor());
-
-        // Programas do Governo
-//        pessoa.getProgramasDoGoverno().clear();
-//        if (dto.pessoa().programasDoGovernoIds() != null) {
-//            for (Long progId : dto.pessoa().programasDoGovernoIds()) {
-//                programaGovernoRepository.findById(progId).ifPresent(pessoa.getProgramasDoGoverno()::add);
-//            }
-//        }
-
         pessoa.setValorTotalPronafs(dto.pessoa().valorTotalPronafs());
+        pessoa.setIsEspolio(Boolean.TRUE.equals(dto.pessoa().isEspolio()));
 
         // Endereço
         EnderecoPessoa endereco = enderecoPessoaRepository.findByPessoa(pessoa);
@@ -220,7 +272,11 @@ public class PessoaService {
         pessoaLote.setDataTerminoContrato(dto.pessoaLote().dataTerminoContrato());
         pessoaLote.setIsResideNoImovel(dto.pessoaLote().isResideNoImovel());
         pessoaLote.setIsDeclarante(dto.pessoaLote().isDeclarante());
-        pessoaLote.setIsContratoPrazoIndeterminado(dto.pessoaLote().isContratoPrazoIndeterminado());
+        //dto.pessoaLote().isContratoPrazoIndeterminado()
+        pessoaLote.setIsContratoPrazoIndeterminado(
+                dto.pessoaLote().isContratoPrazoIndeterminado() != null ? dto.pessoaLote().isContratoPrazoIndeterminado() : false
+        );
+
 
         // Validação: percentual de detenção não pode passar de 100%
         BigDecimal percentDetencaoTotal = pessoaLote.getLote().getPessoasLote().stream()
@@ -230,12 +286,6 @@ public class PessoaService {
             throw new PessoaValidationException("Porcentagem de detenção total do imóvel excede 100%. Verifique os detentores.");
         }
 
-        // Salva tudo
-        pessoaRepository.save(pessoa);
-        enderecoPessoaRepository.save(endereco);
-        documentoPessoaRepository.save(documento);
-        pessoaLoteRepository.save(pessoaLote);
-
         // Pronafs
         pessoa.getPronafs().clear();
         if (dto.pessoa().pronafsIds() != null) {
@@ -243,6 +293,20 @@ public class PessoaService {
                 pronafRepository.findById(pronafId).ifPresent(pessoa.getPronafs()::add);
             }
         }
-    }
 
+        // Salva tudo
+        pessoaRepository.save(pessoa);
+        EnderecoPessoa enderecoPessoa = enderecoPessoaRepository.findByPessoa(pessoa);
+        DocumentoPessoa documentoPessoa = documentoPessoaRepository.findByPessoa(pessoa);
+        pessoaLoteRepository.save(pessoaLote);
+
+        // Recarrega o objeto salvo e retorna o DTO atualizado
+        Pessoa pessoaAtualizada = pessoaRepository.findById(pessoa.getId()).orElseThrow();
+        return new EditarDetentorResponseDTO(
+                PessoaDTO.fromEntity(pessoaAtualizada),
+                PessoaLoteDTO.fromEntity(pessoaLote),
+                enderecoPessoa != null ? EnderecoPessoaDTO.fromEntity(enderecoPessoa) : null,
+                documentoPessoa != null ? DocumentoPessoaDTO.fromEntity(documentoPessoa) : null
+        );
+    }
 }

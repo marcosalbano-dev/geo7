@@ -19,14 +19,15 @@ public class Estrutura implements Serializable {
     @SequenceGenerator(name = "estrutura_seq", sequenceName = "estrutura_id_seq", allocationSize = 1)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lote_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lote_id", unique=true, nullable = false)
     private Lote lote;
 
     private boolean ativo = true;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dhc = new Date();
+
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dhm = new Date();
