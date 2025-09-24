@@ -3,7 +3,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
 import org.geo7.model.entity.Lote;
-import org.geo7.rest.dto.LoteFiltroDTO;
+import org.geo7.dto.LoteFiltroDTO;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;

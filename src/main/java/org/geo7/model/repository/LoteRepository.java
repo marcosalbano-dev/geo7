@@ -1,16 +1,9 @@
 package org.geo7.model.repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import org.geo7.model.entity.Item;
 import org.geo7.model.entity.Lote;
-import org.geo7.rest.dto.LoteFiltroDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -25,4 +18,12 @@ public interface LoteRepository extends JpaRepository<Lote, Long>, LoteRepositor
 
     Optional<Lote> findByProprietario(String proprietario);
 
+    @Query("select l from Lote l where l.municipio.id = :municipioId")
+    List<Lote> findByMunicipioId(@Param("municipioId") Long municipioId);
+
+    @Query("""
+      select l from Lote l
+      where l.municipio.id = :municipioId
+      """)
+    List<Lote> findAllByMunicipioId(@Param("municipioId") Long municipioId);
 }

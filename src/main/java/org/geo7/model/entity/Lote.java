@@ -61,7 +61,6 @@ public class Lote implements Serializable {
     private Municipio municipio;
 
     @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     private Set<FormaObtencao> formaObtencao = new HashSet<>();
 
     @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -3,9 +3,8 @@ package org.geo7.rest;
 import jakarta.validation.Valid;
 import org.geo7.model.entity.*;
 import org.geo7.model.repository.*;
-import org.geo7.rest.dto.LoteDTO;
-import org.geo7.rest.dto.LoteFiltroDTO;
-import org.geo7.service.LoteService;
+import org.geo7.dto.LoteDTO;
+import org.geo7.dto.LoteFiltroDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/lotes")
 @CrossOrigin(origins = "http://localhost:4200")

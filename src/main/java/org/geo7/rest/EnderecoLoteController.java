@@ -1,16 +1,11 @@
 package org.geo7.rest;
 
-import jakarta.validation.Valid;
 import org.geo7.model.entity.EnderecoLote;
-import org.geo7.model.entity.Lote;
 import org.geo7.model.repository.EnderecoLoteRepository;
-import org.geo7.model.repository.LoteRepository;
-import org.geo7.rest.dto.EnderecoLoteDTO;
+import org.geo7.dto.EnderecoLoteDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/endereco-lote")
@@ -18,6 +13,14 @@ public class EnderecoLoteController {
 
     @Autowired
     private EnderecoLoteRepository enderecoLoteRepository;
+
+    @GetMapping("/por-lote/{loteId}")
+    public ResponseEntity<EnderecoLoteDTO> getByLote(@PathVariable Long loteId) {
+        return enderecoLoteRepository.findFirstByLote_Id(loteId)
+                .map(EnderecoLoteDTO::fromEntity)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<EnderecoLoteDTO> getById(@PathVariable Long id) {

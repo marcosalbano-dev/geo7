@@ -6,7 +6,7 @@ import org.geo7.model.entity.Lote;
 import org.geo7.model.repository.DistritoRepository;
 import org.geo7.model.repository.LoteRepository;
 import org.geo7.model.repository.MunicipioRepository;
-import org.geo7.rest.dto.DistritoDTO;
+import org.geo7.dto.DistritoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

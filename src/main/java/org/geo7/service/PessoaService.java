@@ -1,9 +1,10 @@
 package org.geo7.service;
 
 import lombok.RequiredArgsConstructor;
+import org.geo7.dto.*;
 import org.geo7.model.entity.*;
 import org.geo7.model.repository.*;
-import org.geo7.rest.dto.*;
+import org.geo7.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
@@ -25,6 +26,8 @@ public class PessoaService {
     @Autowired private PronafRepository pronafRepository;
     @Autowired private MunicipioRepository municipioRepository;
     @Autowired private LoteRepository loteRepository;
+
+    private static BigDecimal nz(BigDecimal v) { return v != null ? v : BigDecimal.ZERO; }
 
     public Optional<EditarDetentorResponseDTO> getEditarDetentorData(Long pessoaLoteId) {
         Optional<PessoaLote> pessoaLoteOpt = pessoaLoteRepository.findById(pessoaLoteId);
@@ -61,61 +64,6 @@ public class PessoaService {
     }
 
 
-//    @Transactional
-//    public PessoaDTO salvaDetentor(AtualizaDetentorRequestDTO dto) {
-//        // 1) Pessoa
-//        Pessoa pessoa = pessoaRepository.save(dto.pessoa().toEntity());
-//
-//        // 2) PessoaLote (vínculo)
-//        if (dto.pessoaLote() != null && dto.pessoaLote().loteId() != null) {
-//            Lote lote = loteRepository.findById(dto.pessoaLote().loteId())
-//                    .orElseThrow(() -> new IllegalArgumentException("Lote não encontrado: " + dto.pessoaLote().loteId()));
-//            PessoaLote pl = dto.pessoaLote().toEntity(pessoa, lote);
-//
-//            // Se quiser evitar duplicados por (pessoa,lote):
-//            Optional<PessoaLote> existente = pessoaLoteRepository.findByPessoaIdAndLoteId(pessoa.getId(), lote.getId());
-//            if (existente.isPresent()) {
-//                pl.setId(existente.get().getId());
-//            }
-//            pessoaLoteRepository.save(pl);
-//        }
-//
-//        // 3) Endereço da pessoa
-//        if (dto.endereco() != null) {
-//            EnderecoPessoa endereco = dto.endereco().toEntity();
-//            endereco.setPessoa(pessoa);
-//            if (dto.endereco().municipioId() != null) {
-//                Municipio m = municipioRepository.getReferenceById(dto.endereco().municipioId());
-//                endereco.setMunicipio(m);
-//            }
-//            // upsert
-//            if (endereco.getId() == null) {
-//                // Se existe, reaproveite o ID
-//                enderecoPessoaRepository.findFirstByPessoaId(pessoa.getId()).ifPresent(e -> endereco.setId(e.getId()));
-//            }
-//            enderecoPessoaRepository.save(endereco);
-//        }
-//
-//        // 4) DocumentoPessoa (AQUI estava faltando na maioria dos casos)
-//        if (dto.documento() != null) {
-//            DocumentoPessoaDTO docDTO = dto.documento();
-//            Municipio naturalidade = null;
-//            if (docDTO.naturalidadeId() != null) {
-//                naturalidade = municipioRepository.getReferenceById(docDTO.naturalidadeId());
-//            }
-//
-//            DocumentoPessoa doc = docDTO.toEntity(pessoa, naturalidade);
-//
-//            // upsert por pessoa_id (se houver unicidade por pessoa)
-//            documentoPessoaRepository.findFirstByPessoaId(pessoa.getId()).ifPresent(existente -> doc.setId(existente.getId()));
-//            System.out.println("Documento DTO recebido: {}: " + dto.documento());
-//            System.out.println("Documento entidade antes de salvar: {}" + doc);
-//            documentoPessoaRepository.save(doc);
-//        }
-//
-//        // 5) Retorno
-//        return PessoaDTO.fromEntity(pessoa);
-//    }
 
     @Transactional
     public PessoaDTO salvaDetentor(AtualizaDetentorRequestDTO dto) {
@@ -125,36 +73,7 @@ public class PessoaService {
         return PessoaDTO.fromEntity(pessoa);
     }
 
-//    @Transactional
-//    public PessoaDTO atualizaDetentor(Long pessoaLoteId, AtualizaDetentorRequestDTO dto) {
-//        // 1) pega o vínculo existente
-//        PessoaLote vinculo = pessoaLoteRepository.findById(pessoaLoteId)
-//                .orElseThrow(() -> new IllegalArgumentException("PessoaLote não encontrado: " + pessoaLoteId));
-//
-//        // 2) atualiza Pessoa (conserva o id original)
-//        Pessoa pessoaAtual = vinculo.getPessoa();
-//        Pessoa nova = dto.pessoa().toEntity();
-//        nova.setId(pessoaAtual.getId());
-//        Pessoa pessoa = pessoaRepository.save(nova);
-//
-//        // 3) (re)salva vínculo usando o lote da DTO (se veio), senão mantém
-//        Lote lote = vinculo.getLote();
-//        if (dto.pessoaLote() != null && dto.pessoaLote().loteId() != null) {
-//            Long loteId = dto.pessoaLote().loteId();
-//            lote = loteRepository.findById(loteId)
-//                    .orElseThrow(() -> new IllegalArgumentException("Lote não encontrado: " + loteId));
-//        }
-//        PessoaLote novoVinculo = (dto.pessoaLote() != null)
-//                ? dto.pessoaLote().toEntity(pessoa, lote)
-//                : PessoaLote.builder().pessoa(pessoa).lote(lote).build();
-//        novoVinculo.setId(vinculo.getId()); // mantém o mesmo vínculo
-//        pessoaLoteRepository.save(novoVinculo);
-//
-//        // 4) endereço + documento (upsert por pessoa)
-//        upsertVinculoEnderecoDocumento(pessoa, dto);
-//
-//        return PessoaDTO.fromEntity(pessoa);
-//    }
+
 
     private void upsertVinculoEnderecoDocumento(Pessoa pessoa, AtualizaDetentorRequestDTO dto) {
 
@@ -180,6 +99,8 @@ public class PessoaService {
             documentoPessoaRepository.save(doc);
         }
     }
+
+
 
 
     @Transactional
@@ -281,6 +202,7 @@ public class PessoaService {
         // Validação: percentual de detenção não pode passar de 100%
         BigDecimal percentDetencaoTotal = pessoaLote.getLote().getPessoasLote().stream()
                 .map(pl -> pl.equals(pessoaLote) ? dto.pessoaLote().percentDetencao() : pl.getPercentDetencao())
+                .map(PessoaService::nz)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         if (percentDetencaoTotal.compareTo(new BigDecimal("100.00")) > 0) {
             throw new PessoaValidationException("Porcentagem de detenção total do imóvel excede 100%. Verifique os detentores.");

@@ -3,7 +3,7 @@ package org.geo7.rest;
 import jakarta.validation.Valid;
 import org.geo7.model.entity.GranjeiraAgricola;
 import org.geo7.model.repository.GranjeiraAgricolaRepository;
-import org.geo7.rest.dto.GranjeiraAgricolaDTO;
+import org.geo7.dto.GranjeiraAgricolaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/granjeiras-agricolas")
+@RequestMapping("/api/granjeira-agricola")
 public class GranjeiraAgricolaController {
 
     @Autowired

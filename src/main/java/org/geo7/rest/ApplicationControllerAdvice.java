@@ -1,6 +1,6 @@
 package org.geo7.rest;
 
-import org.geo7.rest.exception.ApiErrors;
+import org.geo7.exception.ApiErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;

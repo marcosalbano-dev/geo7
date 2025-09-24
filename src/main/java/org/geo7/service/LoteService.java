@@ -1,8 +1,8 @@
 package org.geo7.service;
 
 import org.geo7.model.repository.LoteRepository;
-import org.geo7.rest.dto.LoteDTO;
-import org.geo7.rest.dto.LoteFiltroDTO;
+import org.geo7.dto.LoteDTO;
+import org.geo7.dto.LoteFiltroDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

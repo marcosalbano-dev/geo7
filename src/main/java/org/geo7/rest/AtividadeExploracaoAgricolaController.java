@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 
 import org.geo7.model.entity.AtividadeExploracaoAgricola;
 import org.geo7.model.repository.AtividadeExploracaoAgricolaRepository;
-import org.geo7.rest.dto.AtividadeExploracaoAgricolaDTO;
+import org.geo7.dto.AtividadeExploracaoAgricolaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

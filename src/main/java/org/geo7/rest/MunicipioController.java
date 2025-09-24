@@ -1,12 +1,9 @@
 package org.geo7.rest;
 
-import jakarta.persistence.Entity;
 import jakarta.validation.Valid;
-import org.geo7.model.entity.Lote;
 import org.geo7.model.entity.Municipio;
-import org.geo7.model.repository.LoteRepository;
 import org.geo7.model.repository.MunicipioRepository;
-import org.geo7.rest.dto.MunicipioDTO;
+import org.geo7.dto.MunicipioDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -7,7 +7,7 @@ import org.geo7.model.entity.SituacaoJuridica;
 import org.geo7.model.repository.FormaObtencaoRepository;
 import org.geo7.model.repository.LoteRepository;
 import org.geo7.model.repository.SituacaoJuridicaRepository;
-import org.geo7.rest.dto.FormaObtencaoDTO;
+import org.geo7.dto.FormaObtencaoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

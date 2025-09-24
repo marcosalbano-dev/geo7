@@ -2,7 +2,7 @@ package org.geo7.enums;
 
 public enum TipoCultura {
     PERMANENTE,
-    TEMPORARIA,
+    TEMPORÁRIA,
     FORRAGEIROS,
     HORTICULTURA,
     OUTROS_PRODUTOS

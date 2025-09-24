@@ -16,7 +16,9 @@ public class EnderecoLote implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "endereco_lote_seq")
-    @SequenceGenerator(name = "endereco_lote_seq", sequenceName = "endereco_lote_id_seq", allocationSize = 1)
+    @SequenceGenerator(name = "endereco_lote_seq",
+            sequenceName = "geo7.endereco_lote_id_seq",
+            allocationSize = 1)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

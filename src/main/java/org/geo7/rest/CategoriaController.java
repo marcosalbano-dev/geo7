@@ -3,7 +3,7 @@ package org.geo7.rest;
 import jakarta.validation.Valid;
 import org.geo7.model.entity.Categoria;
 import org.geo7.model.repository.CategoriaRepository;
-import org.geo7.rest.dto.CategoriaDTO;
+import org.geo7.dto.CategoriaDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

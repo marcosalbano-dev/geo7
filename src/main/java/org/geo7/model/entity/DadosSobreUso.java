@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,7 +32,7 @@ public class DadosSobreUso implements Serializable {
     private Double areaTotalIsolado;
 
     @OneToMany(mappedBy = "dadosSobreUso", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Item> items;
+    private List<Item> items = new ArrayList<>(); // <<< garante não-nulo
 
     @Override
     public String toString() {

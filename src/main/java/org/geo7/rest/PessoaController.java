@@ -1,15 +1,9 @@
 package org.geo7.rest;
 
-import jakarta.validation.Valid;
-import org.geo7.model.entity.Pessoa;
-//import org.geo7.model.entity.ProgramaGoverno;
-import org.geo7.model.entity.Pronaf;
 import org.geo7.model.repository.PessoaRepository;
-//import org.geo7.model.repository.ProgramaGovernoRepository;
-import org.geo7.rest.dto.AtualizaDetentorRequestDTO;
-import org.geo7.rest.dto.EditarDetentorResponseDTO;
-import org.geo7.rest.dto.PessoaDTO;
-import org.geo7.rest.dto.PronafDTO;
+import org.geo7.dto.AtualizaDetentorRequestDTO;
+import org.geo7.dto.EditarDetentorResponseDTO;
+import org.geo7.dto.PessoaDTO;
 import org.geo7.service.PessoaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,11 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,9 +23,6 @@ public class PessoaController {
 
     @Autowired
     private PessoaService pessoaService;
-
-//    @Autowired
-//    private ProgramaGovernoRepository programaRepo;
 
 
     public PessoaController(PessoaRepository pessoaRepository) {
@@ -61,21 +48,11 @@ public class PessoaController {
                         HttpStatus.NOT_FOUND, "Pessoa não encontrada com id: " + id));
     }
 
-//    @PostMapping
-//    public ResponseEntity<PessoaDTO> salvar(@Valid @RequestBody PessoaDTO dto, PronafDTO pronafDTO) {
-//        // Se precisar buscar entidades relacionadas (ex: município), busque aqui
-//        Pessoa pessoa = dto.toEntity();
-//        pessoa = pessoaRepository.save(pessoa);
-//        return ResponseEntity.created(URI.create("/api/pessoas/" + pessoa.getId()))
-//                .body(PessoaDTO.fromEntity(pessoa));
-//    }
 
     @PostMapping
     public ResponseEntity<PessoaDTO> criarPessoaDetentor(@RequestBody AtualizaDetentorRequestDTO dto) {
         try {
             return ResponseEntity.ok(pessoaService.salvaDetentor(dto));
-//            PessoaDTO pessoaSalva = pessoaService.salvaDetentor(dto);
-//            return ResponseEntity.ok(pessoaSalva);
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(
