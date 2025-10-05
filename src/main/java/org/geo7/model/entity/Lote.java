@@ -51,7 +51,7 @@ public class Lote implements Serializable {
     @Column
     private String sncr;
 
-    @Column(nullable = false, length = 11)
+    @Column(nullable = false, length = 14)
     @NotNull(message = "{campo.cpf.obrigatorio}")
     @CPF(message = "{campo.cpf.invalido}")
     private String cpf;

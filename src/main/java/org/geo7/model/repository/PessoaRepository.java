@@ -12,5 +12,7 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 
     List<Pessoa> findByIdIn(Collection<Long> ids);
 
+
+
 }
 

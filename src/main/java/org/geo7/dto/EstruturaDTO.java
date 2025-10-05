@@ -29,7 +29,7 @@ public record EstruturaDTO(
         String litigio,
         Boolean entregouMemorialPlanilha,
         String destinacaoDoImovel,
-        //String pontoDeReferencia,
+        String pontoDeReferencia,
         Integer numeroHerdeiros,
         Double porcentagemDetencao,
         String obsLitigio,
@@ -119,6 +119,7 @@ public record EstruturaDTO(
                 estrutura.getLitigio(),
                 estrutura.getEntregouMemorialPlanilha(),
                 estrutura.getDestinacaoDoImovel(),
+                estrutura.getPontoDeReferencia(),
                 estrutura.getNumeroHerdeiros(),
                 estrutura.getPorcentagemDetencao(),
                 estrutura.getObsLitigio(),
@@ -225,7 +226,7 @@ public record EstruturaDTO(
         estrutura.setLitigio(litigio);
         estrutura.setEntregouMemorialPlanilha(entregouMemorialPlanilha);
         estrutura.setDestinacaoDoImovel(destinacaoDoImovel);
-        //estrutura.setPontoDeReferencia(pontoDeReferencia);
+        estrutura.setPontoDeReferencia(pontoDeReferencia);
         estrutura.setNumeroHerdeiros(numeroHerdeiros);
         estrutura.setObsLitigio(obsLitigio);
         estrutura.setPorcentagemDetencao(porcentagemDetencao);

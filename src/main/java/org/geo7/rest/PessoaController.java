@@ -48,7 +48,6 @@ public class PessoaController {
                         HttpStatus.NOT_FOUND, "Pessoa não encontrada com id: " + id));
     }
 
-
     @PostMapping
     public ResponseEntity<PessoaDTO> criarPessoaDetentor(@RequestBody AtualizaDetentorRequestDTO dto) {
         try {

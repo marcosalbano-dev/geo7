@@ -86,4 +86,13 @@ public class FormaObtencaoController {
                 })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Forma de obtenção não encontrada"));
     }
+
+    @GetMapping("/por-lote/{loteId}")
+    public ResponseEntity<FormaObtencaoDTO> buscarPorLoteId(@PathVariable Long loteId) {
+        return formaObtencaoRepository.findFirstByLoteId(loteId)
+                .map(FormaObtencaoDTO::fromEntity)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Nenhuma forma de obtenção encontrada para o lote ID: " + loteId));
+    }
 }

@@ -195,6 +195,7 @@ public class EstruturaController {
         existente.setLitigio(dto.litigio());
         existente.setEntregouMemorialPlanilha(Boolean.TRUE.equals(dto.entregouMemorialPlanilha()));
         existente.setDestinacaoDoImovel(dto.destinacaoDoImovel());
+        existente.setPontoDeReferencia(dto.pontoDeReferencia());
         existente.setNumeroHerdeiros(dto.numeroHerdeiros());
         existente.setPorcentagemDetencao(dto.porcentagemDetencao());
         existente.setObsLitigio(dto.obsLitigio());
@@ -327,6 +328,7 @@ public class EstruturaController {
         e.setLitigio(dto.litigio());
         e.setEntregouMemorialPlanilha(Boolean.TRUE.equals(dto.entregouMemorialPlanilha()));
         e.setDestinacaoDoImovel(dto.destinacaoDoImovel());
+        e.setPontoDeReferencia(dto.pontoDeReferencia());
         e.setNumeroHerdeiros(dto.numeroHerdeiros());
         e.setPorcentagemDetencao(dto.porcentagemDetencao());
         e.setObsLitigio(dto.obsLitigio());

@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categorias")
@@ -36,11 +37,11 @@ public class CategoriaController {
 
     @GetMapping
     public ResponseEntity<List<CategoriaDTO>> listarTodos() {
-        List<CategoriaDTO> lista = repository.findAll()
-                .stream()
+        List<Categoria> categorias = repository.findAll();
+        List<CategoriaDTO> categoriasDTO = categorias.stream()
                 .map(CategoriaDTO::fromEntity)
-                .toList();
-        return ResponseEntity.ok(lista);
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(categoriasDTO);
     }
 
     @PutMapping("{id}")
