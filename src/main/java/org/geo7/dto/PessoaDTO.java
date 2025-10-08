@@ -92,28 +92,28 @@ public record PessoaDTO(
 
     public Pessoa toEntity() {
         Pessoa pessoa = new Pessoa();
-        pessoa.setId(id);
-        pessoa.setNome(nome);
-        pessoa.setTelefone(telefone);
-        pessoa.setFax(fax);
-        pessoa.setRamal(ramal);
-        pessoa.setEmail(email);
-        pessoa.setNomePai(nomePai);
-        pessoa.setNomeMae(nomeMae);
-        pessoa.setDataNascimento(dataNascimento);
-        pessoa.setSexoPessoa(sexoPessoa);
-        pessoa.setIsEspolio(isEspolio != null ? isEspolio : false);
-        pessoa.setCodigoPessoaIncra(codigoPessoaIncra);
-        pessoa.setCoordenadaEste(coordenadaEste);
-        pessoa.setCoordenadaNorte(coordenadaNorte);
-        pessoa.setAtividadePrincipal(atividadePrincipal);
-        pessoa.setRegimeDeBens(regimeDeBens);
-        pessoa.setDataCasamento(dataCasamento);
-        pessoa.setIsRecebePronaf(Boolean.TRUE.equals(isRecebePronaf));
-        pessoa.setIsRecebeAjudoProgramaGoverno(Boolean.TRUE.equals(isRecebeAjudoProgramaGoverno));
-        pessoa.setQtdPronaf(qtdPronaf != null ? qtdPronaf : 0);
-        pessoa.setValorTotalPronafs(valorTotalPronafs != null ? valorTotalPronafs : BigDecimal.ZERO);
-        pessoa.setRacaCor(racaCor);
+        pessoa.setId(this.id);
+        pessoa.setNome(this.nome);
+        pessoa.setTelefone(this.telefone);
+        pessoa.setFax(this.fax);
+        pessoa.setRamal(this.ramal);
+        pessoa.setEmail(this.email);
+        pessoa.setNomePai(this.nomePai);
+        pessoa.setNomeMae(this.nomeMae);
+        pessoa.setDataNascimento(this.dataNascimento);
+        pessoa.setSexoPessoa(this.sexoPessoa);
+        pessoa.setIsEspolio(null != isEspolio ? this.isEspolio : false);
+        pessoa.setCodigoPessoaIncra(this.codigoPessoaIncra);
+        pessoa.setCoordenadaEste(this.coordenadaEste);
+        pessoa.setCoordenadaNorte(this.coordenadaNorte);
+        pessoa.setAtividadePrincipal(this.atividadePrincipal);
+        pessoa.setRegimeDeBens(this.regimeDeBens);
+        pessoa.setDataCasamento(this.dataCasamento);
+        pessoa.setIsRecebePronaf(Boolean.TRUE.equals(this.isRecebePronaf));
+        pessoa.setIsRecebeAjudoProgramaGoverno(Boolean.TRUE.equals(this.isRecebeAjudoProgramaGoverno));
+        pessoa.setQtdPronaf(null != qtdPronaf ? this.qtdPronaf : 0);
+        pessoa.setValorTotalPronafs(null != valorTotalPronafs ? this.valorTotalPronafs : BigDecimal.ZERO);
+        pessoa.setRacaCor(this.racaCor);
         // **Relacionamentos:**
         // Aqui você pode popular programasDoGoverno via Service/Repository no Controller se precisar.
         return pessoa;

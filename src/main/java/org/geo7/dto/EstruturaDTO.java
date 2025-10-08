@@ -81,15 +81,15 @@ public record EstruturaDTO(
 ) {
     public static EstruturaDTO fromEntity(Estrutura estrutura, FormaObtencao forma) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String dataRegistroFmt = forma != null ? formatarData(forma.getDataRegistro()) : null;
-        String dataPosseFmt    = forma != null ? formatarData(forma.getDataPosse())    : null;
+        String dataRegistroFmt = null != forma ? EstruturaDTO.formatarData(forma.getDataRegistro()) : null;
+        String dataPosseFmt    = null != forma ? EstruturaDTO.formatarData(forma.getDataPosse())    : null;
 
 //        FormaObtencao formaObtencao = Optional.ofNullable(estrutura.getLote())
 //                .map(Lote::getFormaObtencao)
 //                .flatMap(set -> set.stream().findFirst())
 //                .orElse(null);
 
-        SituacaoJuridica situacao = forma != null ? forma.getSituacaoJuridica() : null;
+        SituacaoJuridica situacao = null != forma ? forma.getSituacaoJuridica() : null;
 
 //        String dataRegistroFormatada = (forma != null && forma.getDataRegistro() != null)
 //                ? sdf.format(forma.getDataRegistro()) : null;
@@ -99,10 +99,10 @@ public record EstruturaDTO(
 
         return new EstruturaDTO(
                 estrutura.getId(),
-                estrutura.getLote() != null ? estrutura.getLote().getId() : null,
+                null != estrutura.getLote() ? estrutura.getLote().getId() : null,
                 /* forma de obtenção */
-                forma != null ? forma.getId() : null,
-                forma != null ? forma.getDescricaoFormaDeObtencao() : null,
+                null != forma ? forma.getId() : null,
+                null != forma ? forma.getDescricaoFormaDeObtencao() : null,
 
                 estrutura.getDhc(),
                 estrutura.getDhm(),
@@ -144,26 +144,26 @@ public record EstruturaDTO(
                 estrutura.getIsPossuiElergiaEletrica(),
                 estrutura.getIsPossuiEnergiaAlternativa(),
                 estrutura.getIsRedeDeAbastecimento(),
-                forma != null ? forma.getOficio() : null,
-                forma != null ? forma.getMatricula() : null,
-                forma != null ? forma.getLivro() : null,
-                forma != null ? forma.getNomeCartorio() : null,
+                null != forma ? forma.getOficio() : null,
+                null != forma ? forma.getMatricula() : null,
+                null != forma ? forma.getLivro() : null,
+                null != forma ? forma.getNomeCartorio() : null,
                 dataRegistroFmt,
-                forma != null ? forma.getNumeroRegistro() : null,
-                forma != null && forma.getAreaRegistrada() != null ? forma.getAreaRegistrada().toPlainString() : null,
-                forma != null && forma.getAreaMedida() != null ? forma.getAreaMedida().toPlainString() : null,
-                forma != null ? forma.getMunicipioCartorio() : null,
-                forma != null ? forma.getNumeroHerdeiros() : null,
+                null != forma ? forma.getNumeroRegistro() : null,
+                null != forma && null != forma.getAreaRegistrada() ? forma.getAreaRegistrada().toPlainString() : null,
+                null != forma && null != forma.getAreaMedida() ? forma.getAreaMedida().toPlainString() : null,
+                null != forma ? forma.getMunicipioCartorio() : null,
+                null != forma ? forma.getNumeroHerdeiros() : null,
                 dataPosseFmt,
 
-                situacao != null ? situacao.getId() : null,
-                estrutura.getLote() != null ? estrutura.getLote().getNumero() : null,
-                estrutura.getLote() != null ? estrutura.getLote().getSncr() : null,
-                estrutura.getLote() != null ? estrutura.getLote().getDenominacaoImovel() : null,
-                estrutura.getLote() != null ? estrutura.getLote().getArea() : null,
-                estrutura.getLote() != null && estrutura.getLote().getMunicipio() != null ? estrutura.getLote().getMunicipio().getNome() : null,
-                estrutura.getLote() != null && estrutura.getLote().getMunicipio() != null ? estrutura.getLote().getMunicipio().getId() : null,
-                estrutura.getLote() != null && estrutura.getLote().getDistrito() != null ? estrutura.getLote().getDistrito().getId() : null
+                null != situacao ? situacao.getId() : null,
+                null != estrutura.getLote() ? estrutura.getLote().getNumero() : null,
+                null != estrutura.getLote() ? estrutura.getLote().getSncr() : null,
+                null != estrutura.getLote() ? estrutura.getLote().getDenominacaoImovel() : null,
+                null != estrutura.getLote() ? estrutura.getLote().getArea() : null,
+                null != estrutura.getLote() && null != estrutura.getLote().getMunicipio() ? estrutura.getLote().getMunicipio().getNome() : null,
+                null != estrutura.getLote() && null != estrutura.getLote().getMunicipio() ? estrutura.getLote().getMunicipio().getId() : null,
+                null != estrutura.getLote() && null != estrutura.getLote().getDistrito() ? estrutura.getLote().getDistrito().getId() : null
 
         );
     }
@@ -175,82 +175,82 @@ public record EstruturaDTO(
         Date dataRegistroDate = null;
 
         try {
-            if (areaRegistrada != null && !areaRegistrada.isBlank()) {
-                areaRegistradaValue = new BigDecimal(areaRegistrada);
+            if (null != areaRegistrada && !this.areaRegistrada.isBlank()) {
+                areaRegistradaValue = new BigDecimal(this.areaRegistrada);
             }
-            if (areaMedida != null && !areaMedida.isBlank()) {
-                areaMedidaValue = new BigDecimal(areaMedida);
+            if (null != areaMedida && !this.areaMedida.isBlank()) {
+                areaMedidaValue = new BigDecimal(this.areaMedida);
             }
-            if (dataPosse != null && !dataPosse.isBlank() && !"null".equals(dataPosse)) {
-                dataPosseDate = new SimpleDateFormat("yyyy-MM-dd").parse(dataPosse);
+            if (null != dataPosse && !this.dataPosse.isBlank() && !"null".equals(this.dataPosse)) {
+                dataPosseDate = new SimpleDateFormat("yyyy-MM-dd").parse(this.dataPosse);
             }
-            if (dataRegistro != null && !dataRegistro.isBlank() && !"null".equals(dataRegistro)) {
-                dataRegistroDate = new SimpleDateFormat("yyyy-MM-dd").parse(dataRegistro);
+            if (null != dataRegistro && !this.dataRegistro.isBlank() && !"null".equals(this.dataRegistro)) {
+                dataRegistroDate = new SimpleDateFormat("yyyy-MM-dd").parse(this.dataRegistro);
             }
         } catch (Exception e) {
             throw new IllegalArgumentException("Erro ao converter valores para BigDecimal ou Date", e);
         }
 
         FormaObtencao formaObtencao = FormaObtencao.builder()
-                .descricaoFormaDeObtencao(descricaoFormaDeObtencao)
-                .oficio(oficio)
-                .matricula(matricula)
-                .livro(livro)
-                .nomeCartorio(nomeCartorio)
+                .descricaoFormaDeObtencao(this.descricaoFormaDeObtencao)
+                .oficio(this.oficio)
+                .matricula(this.matricula)
+                .livro(this.livro)
+                .nomeCartorio(this.nomeCartorio)
                 .dataRegistro(String.valueOf(dataRegistroDate))
-                .numeroRegistro(numeroRegistro)
+                .numeroRegistro(this.numeroRegistro)
                 .areaRegistrada(areaRegistradaValue)
                 .areaMedida(areaMedidaValue)
-                .municipioCartorio(municipioCartorio)
+                .municipioCartorio(this.municipioCartorio)
                 .dataPosse(dataPosseDate)
-                .numeroHerdeiros(numeroHerdeirosForma)
+                .numeroHerdeiros(this.numeroHerdeirosForma)
                 .lote(lote)
                 .situacaoJuridica(situacaoJuridica)
                 .build();
 
         Estrutura estrutura = new Estrutura();
-        estrutura.setId(id);
+        estrutura.setId(this.id);
         estrutura.setLote(lote);
-        estrutura.setDhc(dhc);
-        estrutura.setDhm(dhm);
-        estrutura.setFamiliasResidentes(familiasResidentes);
-        estrutura.setPessoasResidentes(pessoasResidentes);
-        estrutura.setTrabalhadoresComCarteira(trabalhadoresComCarteira);
-        estrutura.setTrabalhadoresSemCarteira(trabalhadoresSemCarteira);
-        estrutura.setMaoDeObraFamiliar(maoDeObraFamiliar);
-        estrutura.setValorTotal(valorTotal);
-        estrutura.setValorDasBenfeitorias(valorDasBenfeitorias);
-        estrutura.setValorOutrasAtividades(valorOutrasAtividades);
-        estrutura.setValorTerraNua(valorTerraNua);
-        estrutura.setAreaIrrigada(areaIrrigada);
-        estrutura.setLitigio(litigio);
-        estrutura.setEntregouMemorialPlanilha(entregouMemorialPlanilha);
-        estrutura.setDestinacaoDoImovel(destinacaoDoImovel);
-        estrutura.setPontoDeReferencia(pontoDeReferencia);
-        estrutura.setNumeroHerdeiros(numeroHerdeiros);
-        estrutura.setObsLitigio(obsLitigio);
-        estrutura.setPorcentagemDetencao(porcentagemDetencao);
-        estrutura.setTipoEnergiaEletrica(tipoEnergiaEletrica);
-        estrutura.setIsPossuiElergiaEletrica(isPossuiElergiaEletrica);
-        estrutura.setIsPossuiEnergiaAlternativa(isPossuiEnergiaAlternativa);
-        estrutura.setIsRedeDeAbastecimento(isRedeDeAbastecimento);
-        estrutura.setIsIrrigacao(isIrrigacao);
-        estrutura.setIsFonteAguaExterna(isFonteAguaExterna);
-        estrutura.setIsRioOuRiacho(isRioOuRiacho);
-        estrutura.setIsRioOuRiachoPerene(isRioOuRiachoPerene);
-        estrutura.setIsAcude(isAcude);
-        estrutura.setIsAcudePerene(isAcudePerene);
-        estrutura.setIsOlhoDagua(isOlhoDagua);
-        estrutura.setIsOlhoDaguaPerene(isOlhoDaguaPerene);
-        estrutura.setIsLagoa(isLagoa);
-        estrutura.setIsLagoaPerene(isLagoaPerene);
-        estrutura.setIsPoco(isPoco);
-        estrutura.setIsPocoPerene(isPocoPerene);
-        estrutura.setUsoDaguaAcude(usoDaguaAcude);
-        estrutura.setUsoDaguaLagoa(usoDaguaLagoa);
-        estrutura.setUsoDaguaOlhoDagua(usoDaguaOlhoDagua);
-        estrutura.setUsoDaguaPoco(usoDaguaPoco);
-        estrutura.setUsoDaguaRioOuRiacho(usoDaguaRioOuRiacho);
+        estrutura.setDhc(this.dhc);
+        estrutura.setDhm(this.dhm);
+        estrutura.setFamiliasResidentes(this.familiasResidentes);
+        estrutura.setPessoasResidentes(this.pessoasResidentes);
+        estrutura.setTrabalhadoresComCarteira(this.trabalhadoresComCarteira);
+        estrutura.setTrabalhadoresSemCarteira(this.trabalhadoresSemCarteira);
+        estrutura.setMaoDeObraFamiliar(this.maoDeObraFamiliar);
+        estrutura.setValorTotal(this.valorTotal);
+        estrutura.setValorDasBenfeitorias(this.valorDasBenfeitorias);
+        estrutura.setValorOutrasAtividades(this.valorOutrasAtividades);
+        estrutura.setValorTerraNua(this.valorTerraNua);
+        estrutura.setAreaIrrigada(this.areaIrrigada);
+        estrutura.setLitigio(this.litigio);
+        estrutura.setEntregouMemorialPlanilha(this.entregouMemorialPlanilha);
+        estrutura.setDestinacaoDoImovel(this.destinacaoDoImovel);
+        estrutura.setPontoDeReferencia(this.pontoDeReferencia);
+        estrutura.setNumeroHerdeiros(this.numeroHerdeiros);
+        estrutura.setObsLitigio(this.obsLitigio);
+        estrutura.setPorcentagemDetencao(this.porcentagemDetencao);
+        estrutura.setTipoEnergiaEletrica(this.tipoEnergiaEletrica);
+        estrutura.setIsPossuiElergiaEletrica(this.isPossuiElergiaEletrica);
+        estrutura.setIsPossuiEnergiaAlternativa(this.isPossuiEnergiaAlternativa);
+        estrutura.setIsRedeDeAbastecimento(this.isRedeDeAbastecimento);
+        estrutura.setIsIrrigacao(this.isIrrigacao);
+        estrutura.setIsFonteAguaExterna(this.isFonteAguaExterna);
+        estrutura.setIsRioOuRiacho(this.isRioOuRiacho);
+        estrutura.setIsRioOuRiachoPerene(this.isRioOuRiachoPerene);
+        estrutura.setIsAcude(this.isAcude);
+        estrutura.setIsAcudePerene(this.isAcudePerene);
+        estrutura.setIsOlhoDagua(this.isOlhoDagua);
+        estrutura.setIsOlhoDaguaPerene(this.isOlhoDaguaPerene);
+        estrutura.setIsLagoa(this.isLagoa);
+        estrutura.setIsLagoaPerene(this.isLagoaPerene);
+        estrutura.setIsPoco(this.isPoco);
+        estrutura.setIsPocoPerene(this.isPocoPerene);
+        estrutura.setUsoDaguaAcude(this.usoDaguaAcude);
+        estrutura.setUsoDaguaLagoa(this.usoDaguaLagoa);
+        estrutura.setUsoDaguaOlhoDagua(this.usoDaguaOlhoDagua);
+        estrutura.setUsoDaguaPoco(this.usoDaguaPoco);
+        estrutura.setUsoDaguaRioOuRiacho(this.usoDaguaRioOuRiacho);
 
         // associar forma obtencao se necessário externamente
         forma.setDescricaoFormaDeObtencao(formaObtencao.getDescricaoFormaDeObtencao());
@@ -258,7 +258,7 @@ public record EstruturaDTO(
     }
 
     private static String formatarData(Object v) {
-        if (v == null) return null;
+        if (null == v) return null;
         if (v instanceof Date d) {
             return new SimpleDateFormat("yyyy-MM-dd").format(d);
         }

@@ -25,23 +25,23 @@ public record EnderecoPessoaDTO(
                 e.getBairro(),
                 e.getCep(),
                 e.getCodigoPaisResidencia(),
-                e.getMunicipio() != null ? e.getMunicipio().getId() : null,
-                e.getMunicipio() != null ? e.getMunicipio().getNome() : null,
-                e.getMunicipio() != null ? e.getMunicipio().getUf() : null,
-                e.getPessoa() != null ? e.getPessoa().getId() : null
+                null != e.getMunicipio() ? e.getMunicipio().getId() : null,
+                null != e.getMunicipio() ? e.getMunicipio().getNome() : null,
+                null != e.getMunicipio() ? e.getMunicipio().getUf() : null,
+                null != e.getPessoa() ? e.getPessoa().getId() : null
         );
     }
 
     // Converte de DTO para Entidade (útil no service!)
     public EnderecoPessoa toEntity() {
         EnderecoPessoa endereco = new EnderecoPessoa();
-        endereco.setId(this.id());
-        endereco.setLogradouro(this.logradouro());
-        endereco.setComplemento(this.complemento());
-        endereco.setNumero(this.numero());
-        endereco.setBairro(this.bairro());
-        endereco.setCep(this.cep());
-        endereco.setCodigoPaisResidencia(this.codigoPaisResidencia());
+        endereco.setId(id());
+        endereco.setLogradouro(logradouro());
+        endereco.setComplemento(complemento());
+        endereco.setNumero(numero());
+        endereco.setBairro(bairro());
+        endereco.setCep(cep());
+        endereco.setCodigoPaisResidencia(codigoPaisResidencia());
 
 
         // Observação: municipio e pessoa devem ser setados no service, pois precisa buscar entidades completas!

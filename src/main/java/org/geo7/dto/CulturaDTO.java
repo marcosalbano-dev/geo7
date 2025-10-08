@@ -10,10 +10,10 @@ public record CulturaDTO(Long id, Integer codigoCultura, String nomeCultura, Tip
 
     public Cultura toEntity() {
         Cultura entity = new Cultura();
-        entity.setId(id);
-        entity.setTipoCultura(tipoCultura);
-        entity.setNomeCultura(nomeCultura);
-        entity.setCodigoCultura(codigoCultura);
+        entity.setId(this.id);
+        entity.setTipoCultura(this.tipoCultura);
+        entity.setNomeCultura(this.nomeCultura);
+        entity.setCodigoCultura(this.codigoCultura);
         return entity;
     }
 }

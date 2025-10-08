@@ -11,7 +11,7 @@ public record CategoriaDTO(Long id, String nomeCategoria) {
 
     public Categoria toEntity() {
         Categoria entity = new Categoria();
-        entity.setId(id);
+        entity.setId(this.id);
         entity.setNomeCategoria(entity.getNomeCategoria());
         return entity;
     }

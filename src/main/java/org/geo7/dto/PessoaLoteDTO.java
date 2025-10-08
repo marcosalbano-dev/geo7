@@ -33,8 +33,8 @@ public record PessoaLoteDTO(
     public static PessoaLoteDTO fromEntity(PessoaLote pl) {
         return new PessoaLoteDTO(
                 pl.getId(),
-                pl.getPessoa() != null ? pl.getPessoa().getId() : null,
-                pl.getLote() != null ? pl.getLote().getId() : null,
+                null != pl.getPessoa() ? pl.getPessoa().getId() : null,
+                null != pl.getLote() ? pl.getLote().getId() : null,
                 pl.getDateCreated(),
                 pl.getLastUpdated(),
                 pl.getCodigoImovelRural(),
@@ -55,24 +55,24 @@ public record PessoaLoteDTO(
 
     public PessoaLote toEntity(Pessoa pessoa, Lote lote) {
         return PessoaLote.builder()
-                .id(this.id)
+                .id(id)
                 .pessoa(pessoa)
                 .lote(lote)
-                .dateCreated(this.dateCreated)
-                .lastUpdated(this.lastUpdated)
-                .codigoImovelRural(this.codigoImovelRural)
-                .condicaoPessoaImovelRural(this.condicaoPessoaImovelRural)
-                .percentDetencao(this.percentDetencao)
-                .isDeclarante(this.isDeclarante)
-                .isResideNoImovel(this.isResideNoImovel)
-                .tipoDoAto(this.tipoDoAto)
-                .numeroAto(this.numeroAto)
-                .dataAto(this.dataAto)
-                .quantidadeAreaCedida(this.quantidadeAreaCedida)
-                .atividadePrincipalExploracao(this.atividadePrincipalExploracao)
-                .contrato(this.contrato)
-                .dataTerminoContrato(this.dataTerminoContrato)
-                .isContratoPrazoIndeterminado(this.isContratoPrazoIndeterminado)
+                .dateCreated(dateCreated)
+                .lastUpdated(lastUpdated)
+                .codigoImovelRural(codigoImovelRural)
+                .condicaoPessoaImovelRural(condicaoPessoaImovelRural)
+                .percentDetencao(percentDetencao)
+                .isDeclarante(isDeclarante)
+                .isResideNoImovel(isResideNoImovel)
+                .tipoDoAto(tipoDoAto)
+                .numeroAto(numeroAto)
+                .dataAto(dataAto)
+                .quantidadeAreaCedida(quantidadeAreaCedida)
+                .atividadePrincipalExploracao(atividadePrincipalExploracao)
+                .contrato(contrato)
+                .dataTerminoContrato(dataTerminoContrato)
+                .isContratoPrazoIndeterminado(isContratoPrazoIndeterminado)
                 .build();
     }
 }

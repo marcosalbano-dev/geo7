@@ -29,15 +29,15 @@ public record MunicipioDTO(
 
     public Municipio toEntity() {
         Municipio m = new Municipio();
-        m.setId(id);
-        m.setNome(nome);
-        m.setUf(uf);
-        m.setRegiao(regiao);
-        m.setMicroregiao(microregiao);
-        m.setLatitude(latitude);
-        m.setLongitude(longitude);
-        m.setAreaModuloFiscal(areaModuloFiscal);
-        m.setMesoregiao(mesoregiao);
+        m.setId(this.id);
+        m.setNome(this.nome);
+        m.setUf(this.uf);
+        m.setRegiao(this.regiao);
+        m.setMicroregiao(this.microregiao);
+        m.setLatitude(this.latitude);
+        m.setLongitude(this.longitude);
+        m.setAreaModuloFiscal(this.areaModuloFiscal);
+        m.setMesoregiao(this.mesoregiao);
         return m;
     }
 }

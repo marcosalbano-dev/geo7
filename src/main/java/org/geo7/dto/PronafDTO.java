@@ -18,17 +18,17 @@ public record PronafDTO(
                 pronaf.getFaixaI(),
                 pronaf.getFaixaII(),
                 pronaf.getFaixaIII(),
-                pronaf.getPessoa() != null ? pronaf.getPessoa().getId() : null
+                null != pronaf.getPessoa() ? pronaf.getPessoa().getId() : null
         );
     }
 
     public Pronaf toEntity(Pessoa pessoa) {
         Pronaf pronaf = new Pronaf();
-        pronaf.setId(id);
-        pronaf.setTipo(tipo);
-        pronaf.setFaixaI(faixaI);
-        pronaf.setFaixaII(faixaII);
-        pronaf.setFaixaIII(faixaIII);
+        pronaf.setId(this.id);
+        pronaf.setTipo(this.tipo);
+        pronaf.setFaixaI(this.faixaI);
+        pronaf.setFaixaII(this.faixaII);
+        pronaf.setFaixaIII(this.faixaIII);
         pronaf.setPessoa(pessoa);
         return pronaf;
     }

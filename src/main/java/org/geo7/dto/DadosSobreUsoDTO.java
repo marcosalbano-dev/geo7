@@ -4,7 +4,6 @@ package org.geo7.dto;
 import org.geo7.model.entity.DadosSobreUso;
 import org.geo7.model.entity.Lote;
 // Se o seu ItemDTO estiver em outro pacote, ajuste o import:
-import org.geo7.dto.ItemDTO;
 
 import java.util.List;
 
@@ -19,11 +18,11 @@ public record DadosSobreUsoDTO(
     public static DadosSobreUsoDTO fromEntity(DadosSobreUso e) {
         return new DadosSobreUsoDTO(
                 e.getId(),
-                e.getLote() != null ? e.getLote().getId() : null,
+                null != e.getLote() ? e.getLote().getId() : null,
                 e.getAreaTotalIsolado(),
                 e.getAreaTotalConsorcio(),
                 e.getAreaTotalRotacao(),
-                e.getItems() == null ? List.of()
+                null == e.getItems() ? List.of()
                         : e.getItems().stream().map(ItemDTO::fromEntity).toList()
         );
     }
@@ -35,17 +34,17 @@ public record DadosSobreUsoDTO(
      */
     public DadosSobreUso toEntityShallow() {
         var d = new DadosSobreUso();
-        d.setId(id);
-        d.setAreaTotalIsolado(z(areaTotalIsolado));
-        d.setAreaTotalConsorcio(z(areaTotalConsorcio));
-        d.setAreaTotalRotacao(z(areaTotalRotacao));
-        if (loteId != null) {
+        d.setId(this.id);
+        d.setAreaTotalIsolado(DadosSobreUsoDTO.z(this.areaTotalIsolado));
+        d.setAreaTotalConsorcio(DadosSobreUsoDTO.z(this.areaTotalConsorcio));
+        d.setAreaTotalRotacao(DadosSobreUsoDTO.z(this.areaTotalRotacao));
+        if (null != loteId) {
             var l = new Lote();
-            l.setId(loteId);
+            l.setId(this.loteId);
             d.setLote(l);
         }
         return d;
     }
 
-    private static Double z(Double v) { return v == null ? 0d : v; }
+    private static Double z(Double v) { return null == v ? 0.0d : v; }
 }

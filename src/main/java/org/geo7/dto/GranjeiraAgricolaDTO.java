@@ -20,10 +20,10 @@ public record GranjeiraAgricolaDTO(
 
     public GranjeiraAgricola toEntity() {
         GranjeiraAgricola entity = new GranjeiraAgricola();
-        entity.setId(id);
-        entity.setDenominacao(denominacao);
-        entity.setDescricao(descricao);
-        entity.setCodigo(codigo);
+        entity.setId(this.id);
+        entity.setDenominacao(this.denominacao);
+        entity.setDescricao(this.descricao);
+        entity.setCodigo(this.codigo);
         return entity;
     }
 }

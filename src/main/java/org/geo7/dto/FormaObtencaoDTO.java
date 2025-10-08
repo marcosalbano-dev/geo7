@@ -39,26 +39,26 @@ public record FormaObtencaoDTO(
                 entity.getMunicipioCartorio(),
                 entity.getNumeroHerdeiros(),
                 entity.getDataPosse(),
-                entity.getLote() != null ? entity.getLote().getId() : null,
-                entity.getSituacaoJuridica() != null ? entity.getSituacaoJuridica().getId() : null
+                null != entity.getLote() ? entity.getLote().getId() : null,
+                null != entity.getSituacaoJuridica() ? entity.getSituacaoJuridica().getId() : null
         );
     }
 
     public FormaObtencao toEntity(Lote lote, SituacaoJuridica situacaoJuridica) {
         return FormaObtencao.builder()
-                .id(id)
-                .descricaoFormaDeObtencao(descricaoFormaDeObtencao)
-                .oficio(oficio)
-                .matricula(matricula)
-                .livro(livro)
-                .nomeCartorio(nomeCartorio)
-                .dataRegistro(dataRegistro)
-                .numeroRegistro(numeroRegistro)
-                .areaRegistrada(areaRegistrada != null ? areaRegistrada : BigDecimal.ZERO)
-                .areaMedida(areaMedida != null ? areaMedida : BigDecimal.ZERO)
-                .municipioCartorio(municipioCartorio)
-                .numeroHerdeiros(numeroHerdeiros)
-                .dataPosse(dataPosse)
+                .id(this.id)
+                .descricaoFormaDeObtencao(this.descricaoFormaDeObtencao)
+                .oficio(this.oficio)
+                .matricula(this.matricula)
+                .livro(this.livro)
+                .nomeCartorio(this.nomeCartorio)
+                .dataRegistro(this.dataRegistro)
+                .numeroRegistro(this.numeroRegistro)
+                .areaRegistrada(null != areaRegistrada ? this.areaRegistrada : BigDecimal.ZERO)
+                .areaMedida(null != areaMedida ? this.areaMedida : BigDecimal.ZERO)
+                .municipioCartorio(this.municipioCartorio)
+                .numeroHerdeiros(this.numeroHerdeiros)
+                .dataPosse(this.dataPosse)
                 .lote(lote)
                 .situacaoJuridica(situacaoJuridica)
                 .build();

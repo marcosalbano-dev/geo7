@@ -24,14 +24,14 @@ public record EnderecoLoteDTO(
     public static EnderecoLoteDTO fromEntity(EnderecoLote enderecoLote) {
         return new EnderecoLoteDTO(
                 enderecoLote.getId(),
-                enderecoLote.getLote() != null ? enderecoLote.getLote().getId() : null,
+                null != enderecoLote.getLote() ? enderecoLote.getLote().getId() : null,
                 enderecoLote.getAtivo(),
                 enderecoLote.getDhc(),
                 enderecoLote.getDhm(),
                 enderecoLote.getPontoDeReferencia(),
                 enderecoLote.getCodImoReceita(),
                 enderecoLote.getAreaUrbana(),
-                enderecoLote.getDistrito() != null ? enderecoLote.getDistrito().getId() : null,
+                null != enderecoLote.getDistrito() ? enderecoLote.getDistrito().getId() : null,
                 enderecoLote.getComunidade(),
                 enderecoLote.getLocalidade()
         );
@@ -43,29 +43,29 @@ public record EnderecoLoteDTO(
      */
     public EnderecoLote toEntity() {
         EnderecoLote enderecoLote = new EnderecoLote();
-        enderecoLote.setId(this.id());
+        enderecoLote.setId(id());
 
-        if (this.loteId() != null) {
+        if (null != this.loteId()) {
             Lote lote = new Lote();
-            lote.setId(this.loteId());
+            lote.setId(loteId());
             enderecoLote.setLote(lote);
         }
 
-        enderecoLote.setAtivo(this.ativo() != null ? this.ativo() : true);
-        enderecoLote.setDhc(this.dhc() != null ? this.dhc() : new Date());
-        enderecoLote.setDhm(this.dhm() != null ? this.dhm() : new Date());
-        enderecoLote.setPontoDeReferencia(this.pontoDeReferencia());
-        enderecoLote.setCodImoReceita(this.codImoReceita());
-        enderecoLote.setAreaUrbana(this.areaUrbana() != null ? this.areaUrbana() : BigDecimal.ZERO);
+        enderecoLote.setAtivo(null != this.ativo() ? ativo() : true);
+        enderecoLote.setDhc(null != this.dhc() ? dhc() : new Date());
+        enderecoLote.setDhm(null != this.dhm() ? dhm() : new Date());
+        enderecoLote.setPontoDeReferencia(pontoDeReferencia());
+        enderecoLote.setCodImoReceita(codImoReceita());
+        enderecoLote.setAreaUrbana(null != this.areaUrbana() ? areaUrbana() : BigDecimal.ZERO);
 
-        if (this.distritoId() != null) {
+        if (null != this.distritoId()) {
             Distrito distrito = new Distrito();
-            distrito.setId(this.distritoId());
+            distrito.setId(distritoId());
             enderecoLote.setDistrito(distrito);
         }
 
-        enderecoLote.setComunidade(this.comunidade());
-        enderecoLote.setLocalidade(this.localidade());
+        enderecoLote.setComunidade(comunidade());
+        enderecoLote.setLocalidade(localidade());
 
         return enderecoLote;
     }

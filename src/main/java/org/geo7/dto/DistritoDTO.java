@@ -15,15 +15,15 @@ public record DistritoDTO(
                 d.getId(),
                 d.getCodigoDistrito(),
                 d.getNomeDistrito(),
-                d.getMunicipio() != null ? d.getMunicipio().getId() : null
+                null != d.getMunicipio() ? d.getMunicipio().getId() : null
         );
     }
 
     public Distrito toEntity(Municipio municipio) {
         Distrito d = new Distrito();
-        d.setId(id);
-        d.setCodigoDistrito(codigoDistrito);
-        d.setNomeDistrito(nomeDistrito);
+        d.setId(this.id);
+        d.setCodigoDistrito(this.codigoDistrito);
+        d.setNomeDistrito(this.nomeDistrito);
         d.setMunicipio(municipio);
         return d;
     }

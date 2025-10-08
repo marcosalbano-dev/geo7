@@ -9,42 +9,42 @@ public class LoteFiltroDTO {
     private String denominacaoImovel;
 
     public String getCpf() {
-        return this.cpf;
+        return cpf;
     }
 
-    public void setCpf(final String cpf) {
+    public void setCpf(String cpf) {
         this.cpf = cpf;
     }
 
     public String getProprietario() {
-        return this.proprietario;
+        return proprietario;
     }
 
-    public void setProprietario(final String proprietario) {
+    public void setProprietario(String proprietario) {
         this.proprietario = proprietario;
     }
 
     public Long getMunicipioId() {
-        return this.municipioId;
+        return municipioId;
     }
 
-    public void setMunicipioId(final Long municipioId) {
+    public void setMunicipioId(Long municipioId) {
         this.municipioId = municipioId;
     }
 
     public String getNumero() {
-        return this.numero;
+        return numero;
     }
 
-    public void setNumero(final String numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
 
     public String getDenominacaoImovel() {
-        return this.denominacaoImovel;
+        return denominacaoImovel;
     }
 
-    public void setDenominacaoImovel(final String denominacaoImovel) {
+    public void setDenominacaoImovel(String denominacaoImovel) {
         this.denominacaoImovel = denominacaoImovel;
     }
 }

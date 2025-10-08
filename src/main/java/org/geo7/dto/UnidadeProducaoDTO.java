@@ -18,9 +18,9 @@ public record UnidadeProducaoDTO(
 
     public UnidadeProducao toEntity() {
         UnidadeProducao unidadeProducao = new UnidadeProducao();
-        unidadeProducao.setId(id);
-        unidadeProducao.setUnidade(unidade);
-        unidadeProducao.setCodigoUnidade(codigoUnidade);
+        unidadeProducao.setId(this.id);
+        unidadeProducao.setUnidade(this.unidade);
+        unidadeProducao.setCodigoUnidade(this.codigoUnidade);
         return unidadeProducao;
     }
 }

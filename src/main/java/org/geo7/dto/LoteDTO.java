@@ -40,34 +40,34 @@ public record LoteDTO(
                 lote.getPerimetro(),
                 lote.getSncr(),
                 lote.getCpf(),
-                lote.getMunicipio() != null ? lote.getMunicipio().getId() : null,
-                lote.getMunicipio() != null ? lote.getMunicipio().getNome() : null,
-                lote.getFormaObtencao() != null && !lote.getFormaObtencao().isEmpty()
+                null != lote.getMunicipio() ? lote.getMunicipio().getId() : null,
+                null != lote.getMunicipio() ? lote.getMunicipio().getNome() : null,
+                null != lote.getFormaObtencao() && !lote.getFormaObtencao().isEmpty()
                         ? lote.getFormaObtencao().iterator().next().getDescricaoFormaDeObtencao() : null,
-                lote.getSituacaoJuridica() != null ? lote.getSituacaoJuridica().getId() : null,
+                null != lote.getSituacaoJuridica() ? lote.getSituacaoJuridica().getId() : null,
                 lote.getDataTerminoPeriodoDeUso(),
-                lote.getDistrito() != null ? lote.getDistrito().getId() : null,
-                lote.getDistrito() != null ? lote.getDistrito().getNomeDistrito() : null,
-                lote.getSituacaoJuridica() != null ? lote.getSituacaoJuridica().getNome() : null
+                null != lote.getDistrito() ? lote.getDistrito().getId() : null,
+                null != lote.getDistrito() ? lote.getDistrito().getNomeDistrito() : null,
+                null != lote.getSituacaoJuridica() ? lote.getSituacaoJuridica().getNome() : null
         );
     }
 
     public Lote toEntity(Municipio municipio, SituacaoJuridica situacaoJuridica, Distrito distrito) {
         Lote lote = new Lote();
-        lote.setId(id);
-        lote.setProprietario(proprietario);
-        lote.setArea(area);
-        lote.setDenominacaoImovel(denominacaoImovel);
-        lote.setNumero(numero);
-        lote.setDhc(dhc != null ? dhc : new Date());
-        lote.setDhm(dhm != null ? dhm : new Date());
-        lote.setPerimetro(perimetro);
-        lote.setSncr(sncr);
-        lote.setCpf(cpf);
+        lote.setId(this.id);
+        lote.setProprietario(this.proprietario);
+        lote.setArea(this.area);
+        lote.setDenominacaoImovel(this.denominacaoImovel);
+        lote.setNumero(this.numero);
+        lote.setDhc(null != dhc ? this.dhc : new Date());
+        lote.setDhm(null != dhm ? this.dhm : new Date());
+        lote.setPerimetro(this.perimetro);
+        lote.setSncr(this.sncr);
+        lote.setCpf(this.cpf);
         lote.setMunicipio(municipio);
         lote.setSituacaoJuridica(situacaoJuridica);
         lote.setDistrito(distrito);
-        lote.setDataTerminoPeriodoDeUso(dataTerminoPeriodoDeUso);
+        lote.setDataTerminoPeriodoDeUso(this.dataTerminoPeriodoDeUso);
         return lote;
     }
 }

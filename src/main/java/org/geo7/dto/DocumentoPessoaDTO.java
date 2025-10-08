@@ -39,7 +39,7 @@ public record DocumentoPessoaDTO(
     public static DocumentoPessoaDTO fromEntity(DocumentoPessoa d) {
         return new DocumentoPessoaDTO(
                 d.getId(),
-                d.getPessoa() != null ? d.getPessoa().getId() : null,
+                null != d.getPessoa() ? d.getPessoa().getId() : null,
                 d.getTipoDocumentoIdentificacao(),
                 d.getNumeroDocumentoIdentificacao(),
                 d.getOrgaoEmissor(),
@@ -67,41 +67,41 @@ public record DocumentoPessoaDTO(
                 d.getPcePais(),
                 d.getPcePercentCapital(),
                 d.getObsevacoesQuadro7(),
-                d.getNaturalidade() != null ? d.getNaturalidade().getId() : null
+                null != d.getNaturalidade() ? d.getNaturalidade().getId() : null
         );
     }
 
     public DocumentoPessoa toEntity(Pessoa pessoa, Municipio naturalidade) {
         DocumentoPessoa d = new DocumentoPessoa();
-        d.setId(this.id());
+        d.setId(id());
         d.setPessoa(pessoa); // deve ser a entidade já buscada no service!
-        d.setTipoDocumentoIdentificacao(this.tipoDocumentoIdentificacao());
-        d.setNumeroDocumentoIdentificacao(this.numeroDocumentoIdentificacao());
-        d.setOrgaoEmissor(this.orgaoEmissor());
-        d.setUfOrgaoEmissor(this.ufOrgaoEmissor());
-        d.setTipoNacionalidade(this.tipoNacionalidade());
-        d.setCpf(this.cpf());
-        d.setCodigoPaisOrigem(this.codigoPaisOrigem());
-        d.setEstadoCivil(this.estadoCivil());
-        d.setTipoPessoa(this.tipoPessoa());
-        d.setCnpj(this.cnpj());
-        d.setNaturezaJuridica(this.naturezaJuridica());
-        d.setCapitalNacional(this.capitalNacional());
-        d.setCapitalEstrangeiro(this.capitalEstrangeiro());
-        d.setRegistroJuntaComercial(this.registroJuntaComercial());
-        d.setNomeFantasia(this.nomeFantasia());
-        d.setCodigoPaisSede(this.codigoPaisSede());
-        d.setUfPaisSede(this.ufPaisSede());
-        d.setTipoDocumentoRepresentanteLegal(this.tipoDocumentoRepresentanteLegal());
-        d.setNumeroDocumentoRepresentanteLegal(this.numeroDocumentoRepresentanteLegal());
-        d.setCodigoPaisResidencia(this.codigoPaisResidencia());
-        d.setTipoDePoder(this.tipoDePoder());
-        d.setTipoDeGoverno(this.tipoDeGoverno());
-        d.setPercentCapitalNacional(this.percentCapitalNacional());
-        d.setPercentCapitalEstrangeiro(this.percentCapitalEstrangeiro());
-        d.setPcePais(this.pcePais());
-        d.setPcePercentCapital(this.pcePercentCapital());
-        d.setObsevacoesQuadro7(this.obsevacoesQuadro7());
+        d.setTipoDocumentoIdentificacao(tipoDocumentoIdentificacao());
+        d.setNumeroDocumentoIdentificacao(numeroDocumentoIdentificacao());
+        d.setOrgaoEmissor(orgaoEmissor());
+        d.setUfOrgaoEmissor(ufOrgaoEmissor());
+        d.setTipoNacionalidade(tipoNacionalidade());
+        d.setCpf(cpf());
+        d.setCodigoPaisOrigem(codigoPaisOrigem());
+        d.setEstadoCivil(estadoCivil());
+        d.setTipoPessoa(tipoPessoa());
+        d.setCnpj(cnpj());
+        d.setNaturezaJuridica(naturezaJuridica());
+        d.setCapitalNacional(capitalNacional());
+        d.setCapitalEstrangeiro(capitalEstrangeiro());
+        d.setRegistroJuntaComercial(registroJuntaComercial());
+        d.setNomeFantasia(nomeFantasia());
+        d.setCodigoPaisSede(codigoPaisSede());
+        d.setUfPaisSede(ufPaisSede());
+        d.setTipoDocumentoRepresentanteLegal(tipoDocumentoRepresentanteLegal());
+        d.setNumeroDocumentoRepresentanteLegal(numeroDocumentoRepresentanteLegal());
+        d.setCodigoPaisResidencia(codigoPaisResidencia());
+        d.setTipoDePoder(tipoDePoder());
+        d.setTipoDeGoverno(tipoDeGoverno());
+        d.setPercentCapitalNacional(percentCapitalNacional());
+        d.setPercentCapitalEstrangeiro(percentCapitalEstrangeiro());
+        d.setPcePais(pcePais());
+        d.setPcePercentCapital(pcePercentCapital());
+        d.setObsevacoesQuadro7(obsevacoesQuadro7());
         d.setNaturalidade(naturalidade); // também deve ser buscada no service!
         return d;
     }

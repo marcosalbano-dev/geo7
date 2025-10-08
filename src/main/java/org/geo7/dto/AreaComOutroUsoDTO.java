@@ -10,9 +10,9 @@ public record AreaComOutroUsoDTO(Long id, String codigo, String denominacao) {
 
     public AreaComOutroUso toEntity() {
         AreaComOutroUso entity = new AreaComOutroUso();
-        entity.setId(id);
-        entity.setDenominacao(denominacao);
-        entity.setCodigo(codigo);
+        entity.setId(this.id);
+        entity.setDenominacao(this.denominacao);
+        entity.setCodigo(this.codigo);
         return entity;
     }
 }

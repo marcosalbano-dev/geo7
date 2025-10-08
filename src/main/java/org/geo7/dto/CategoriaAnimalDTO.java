@@ -10,9 +10,9 @@ public record CategoriaAnimalDTO(Long id, String codigo, String denominaoCategor
 
     public CategoriaAnimal toEntity() {
         CategoriaAnimal entity = new CategoriaAnimal();
-        entity.setId(id);
-        entity.setDenominaoCategoriaAnimal(denominaoCategoriaAnimal);
-        entity.setCodigo(codigo);
+        entity.setId(this.id);
+        entity.setDenominaoCategoriaAnimal(this.denominaoCategoriaAnimal);
+        entity.setCodigo(this.codigo);
         return entity;
     }
 }

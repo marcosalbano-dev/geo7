@@ -81,8 +81,9 @@ public class DadosSobreUsoController {
         var entidade = new DadosSobreUso();
 
         if (dto.loteId() != null) {
-            var l = new Lote(); l.setId(dto.loteId());
-            entidade.setLote(l);
+            Lote lote = loteRepository.findById(dto.loteId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado"));
+            entidade.setLote(lote);
         }
         entidade.setAreaTotalIsolado(dto.areaTotalIsolado());
         entidade.setAreaTotalConsorcio(dto.areaTotalConsorcio());
@@ -112,8 +113,9 @@ public class DadosSobreUsoController {
 
         // pai
         if (dto.loteId() != null) {
-            var l = new Lote(); l.setId(dto.loteId());
-            entidade.setLote(l);
+            Lote lote = loteRepository.findById(dto.loteId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado"));
+            entidade.setLote(lote);
         }
         entidade.setAreaTotalIsolado(dto.areaTotalIsolado());
         entidade.setAreaTotalConsorcio(dto.areaTotalConsorcio());
@@ -161,9 +163,9 @@ public class DadosSobreUsoController {
 
         // lote no pai (necessário para popular lote_id em cada item)
         if (dto.loteId() != null) {
-            Lote l = new Lote();
-            l.setId(dto.loteId());
-            entidade.setLote(l);
+            Lote lote = loteRepository.findById(dto.loteId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Lote não encontrado"));
+            entidade.setLote(lote);
         }
 
         entidade.setAreaTotalIsolado(dto.areaTotalIsolado());

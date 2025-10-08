@@ -15,9 +15,9 @@
     
         public AtividadeExploracaoAgricola toEntity() {
             AtividadeExploracaoAgricola entity = new AtividadeExploracaoAgricola();
-            entity.setId(id);
-            entity.setAreaExplorada(areaExplorada);
-            entity.setIndicadorRestricao(indicadorRestricao);
+            entity.setId(this.id);
+            entity.setAreaExplorada(this.areaExplorada);
+            entity.setIndicadorRestricao(this.indicadorRestricao);
             return entity;
         }
     }

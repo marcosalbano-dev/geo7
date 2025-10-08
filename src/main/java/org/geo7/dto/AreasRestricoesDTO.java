@@ -9,9 +9,9 @@ public record AreasRestricoesDTO(Long id, String codigo, String tipoAreaRestrica
 
     public AreasRestricoes toEntity() {
         AreasRestricoes entity = new AreasRestricoes();
-        entity.setId(id);
-        entity.setCodigo(codigo);
-        entity.setTipoAreaRestricao(tipoAreaRestricao);
+        entity.setId(this.id);
+        entity.setCodigo(this.codigo);
+        entity.setTipoAreaRestricao(this.tipoAreaRestricao);
         return entity;
     }
 }
