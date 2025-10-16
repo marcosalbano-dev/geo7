@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/culturas")
-@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 public class CulturaController {
 

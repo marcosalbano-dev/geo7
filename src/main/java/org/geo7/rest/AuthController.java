@@ -14,8 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
@@ -30,6 +29,7 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO request) {
@@ -61,7 +61,7 @@ public class AuthController {
 
     private UUID extractUserIdFromToken(String token) {
         // Remover "Bearer " do início do token
-        String cleanToken = token.replace("Bearer ", "");
+        token.replace("Bearer ", "");
 
         // Aqui você pode usar o JwtService para extrair o userId
         // Por enquanto, vou usar um método simples

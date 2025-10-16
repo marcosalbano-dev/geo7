@@ -22,7 +22,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pessoa-lote")
-@CrossOrigin(origins = "http://localhost:4200")
 public class PessoaLoteController {
 
     @Autowired

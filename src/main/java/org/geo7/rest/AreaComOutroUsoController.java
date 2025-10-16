@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/areas-com-outro-uso")
-@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 public class AreaComOutroUsoController {
 

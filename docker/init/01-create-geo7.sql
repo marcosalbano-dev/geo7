@@ -1,0 +1,35 @@
+-- Cria a role se não existir
+DO $main$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'geo7_app') THEN
+    EXECUTE 'CREATE ROLE geo7_app LOGIN ENCRYPTED PASSWORD ''Geo7@2025''';
+END IF;
+END
+$main$;
+
+-- Cria o DB se não existir (usa \gexec do psql)
+SELECT 'CREATE DATABASE geo7_new OWNER geo7_app'
+    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'geo7_new')\gexec
+
+-- Conecta no DB da aplicação
+    \connect geo7_new
+
+-- Schemas
+CREATE SCHEMA IF NOT EXISTS geo7 AUTHORIZATION geo7_app;
+CREATE SCHEMA IF NOT EXISTS ibge AUTHORIZATION geo7_app;
+
+-- search_path padrão do DB
+ALTER DATABASE geo7_new SET search_path = geo7, public, ibge;
+
+-- Permissões básicas
+GRANT CONNECT ON DATABASE geo7_new TO geo7_app;
+
+-- Default privileges para objetos futuros
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO geo7_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO geo7_app;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA geo7 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO geo7_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA geo7 GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO geo7_app;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA ibge GRANT SELECT ON TABLES TO geo7_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA ibge GRANT USAGE, SELECT ON SEQUENCES TO geo7_app;

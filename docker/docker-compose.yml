@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: geo7-postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # (opcional p/ ferramentas no host) descomente se quiser acessar o DB via localhost:55432
+    # ports:
+    #   - "55432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - geo7-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    image: marcosalbano/geo7-api:1.0.1
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: geo7-api
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      SPRING_JPA_SHOW_SQL: ${SPRING_JPA_SHOW_SQL}
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL}
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SERVER_PORT: ${SERVER_PORT}
+    ports:
+      - "8080:8080"   # DEV: acesso direto à API
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - geo7-network
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../../geo7-app        # ajuste para a pasta do seu Dockerfile do web
+      dockerfile: Dockerfile     # seu Dockerfile Nginx
+    image: geo7-web:latest
+    container_name: geo7-web
+    depends_on:
+      - app
+    ports:
+      - "8081:80"                # DEV: frontend em http://localhost:8081
+    networks:
+      - geo7-network
+    restart: unless-stopped
+    # (opcional) montar env.js pra trocar API sem rebuild
+    # volumes:
+    #   - ./frontend/env.js:/usr/share/nginx/html/assets/env.js:ro
+
+volumes:
+  postgres_data:
+
+networks:
+  geo7-network:
+    driver: bridge
