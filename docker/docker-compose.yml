@@ -13,7 +13,7 @@ services:
     #   - "55432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/init:/docker-entrypoint-initdb.d:ro
+      - ./init:/docker-entrypoint-initdb.d:ro
     networks:
       - geo7-network
     healthcheck:
