@@ -20,7 +20,7 @@ public class Estrutura implements Serializable {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lote_id", unique=true, nullable = false)
+    @JoinColumn(name = "lote_id", unique=true, nullable = true)
     private Lote lote;
 
     private boolean ativo = true;

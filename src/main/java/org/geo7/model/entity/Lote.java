@@ -3,8 +3,6 @@ package org.geo7.model.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -26,8 +24,7 @@ public class Lote implements Serializable {
     @SequenceGenerator(name = "lotes_seq", sequenceName = "lotes_id_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false, length = 150)
-    @NotEmpty(message = "{campo.proprietario.obrigatorio}")
+    @Column(nullable = true, length = 150)
     private String proprietario;
 
     @Column(precision = 18, scale = 4)
@@ -36,7 +33,7 @@ public class Lote implements Serializable {
     @Column
     private String denominacaoImovel;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = true, length = 50)
     private String numero;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -51,13 +48,12 @@ public class Lote implements Serializable {
     @Column
     private String sncr;
 
-    @Column(nullable = false, length = 14)
-    @NotNull(message = "{campo.cpf.obrigatorio}")
+    @Column(nullable = true, length = 14)
     @CPF(message = "{campo.cpf.invalido}")
     private String cpf;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "municipio_id", nullable = false, referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "municipio_id", nullable = true, referencedColumnName = "id")
     private Municipio municipio;
 
     @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL, orphanRemoval = true)
