@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo7 - Teste</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            min-height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 Geo7 - Sistema de Teste</h1>
+        
+        <div class="status success">
+            ✅ Container nginx funcionando corretamente!
+        </div>
+        
+        <div class="status info">
+            ℹ️ Este é um arquivo de teste para verificar se o servidor web está funcionando.
+        </div>
+        
+        <div class="test-section">
+            <h3>🧪 Testes de Conectividade</h3>
+            <button onclick="testAPI()">Testar API Backend</button>
+            <button onclick="testAuth()">Testar Autenticação</button>
+            <button onclick="testHealth()">Testar Health Check</button>
+            <div id="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Informações do Sistema</h3>
+            <p><strong>URL:</strong> <span id="currentUrl"></span></p>
+            <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+            <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔧 Próximos Passos</h3>
+            <ol>
+                <li>Verificar se o backend está rodando na porta 8080</li>
+                <li>Configurar o Angular para apontar para o backend correto</li>
+                <li>Fazer build do Angular com as configurações corretas</li>
+                <li>Substituir este arquivo pelo build do Angular</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Atualizar informações da página
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('pt-BR');
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+
+        // Função para testar a API
+        async function testAPI() {
+            const result = document.getElementById('result');
+            result.innerHTML = '🔄 Testando API...';
+            
+            try {
+                const response = await fetch('http://18-228-94-6.sslip.io:8080/api/healthz');
+                if (response.ok) {
+                    const data = await response.text();
+                    result.innerHTML = `✅ API funcionando!<br>Resposta: ${data}`;
+                } else {
+                    result.innerHTML = `❌ API retornou erro: ${response.status}`;
+                }
+            } catch (error) {
+                result.innerHTML = `❌ Erro ao conectar com API: ${error.message}`;
+            }
+        }
+
+        // Função para testar autenticação
+        async function testAuth() {
+            const result = document.getElementById('result');
+            result.innerHTML = '🔄 Testando autenticação...';
+            
+            try {
+                const response = await fetch('http://18-228-94-6.sslip.io:8080/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@geo7.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `✅ Autenticação funcionando!<br>Token: ${data.token}`;
+                } else {
+                    result.innerHTML = `❌ Autenticação falhou: ${response.status}`;
+                }
+            } catch (error) {
+                result.innerHTML = `❌ Erro na autenticação: ${error.message}`;
+            }
+        }
+
+        // Função para testar health check
+        async function testHealth() {
+            const result = document.getElementById('result');
+            result.innerHTML = '🔄 Testando health check...';
+            
+            try {
+                const response = await fetch('http://18-228-94-6.sslip.io:8080/actuator/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `✅ Health check OK!<br>Status: ${data.status}`;
+                } else {
+                    result.innerHTML = `❌ Health check falhou: ${response.status}`;
+                }
+            } catch (error) {
+                result.innerHTML = `❌ Erro no health check: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
+
