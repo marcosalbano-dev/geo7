@@ -46,10 +46,37 @@ echo "✅ Backend atualizado"
 # 4. Atualizar frontend
 echo ""
 echo "4. Atualizando frontend..."
+echo "   Removendo arquivos antigos..."
 sudo rm -rf /var/www/html/*
-sudo cp -r frontend/* /var/www/html/
+echo "   Verificando estrutura do frontend..."
+
+# Detectar onde está o index.html (pode estar em frontend/ ou frontend/browser/)
+if [ -f "frontend/browser/index.html" ]; then
+    echo "   ✅ Estrutura Angular detectada (browser/ subdiretório)"
+    echo "   Copiando conteúdo de frontend/browser/ para /var/www/html/..."
+    sudo cp -r frontend/browser/* /var/www/html/
+elif [ -f "frontend/index.html" ]; then
+    echo "   ✅ Estrutura padrão detectada"
+    echo "   Copiando conteúdo de frontend/ para /var/www/html/..."
+    sudo cp -r frontend/* /var/www/html/
+else
+    echo "   ⚠️ AVISO: index.html não encontrado em frontend/ nem frontend/browser/"
+    echo "   Tentando copiar tudo mesmo assim..."
+    sudo cp -r frontend/* /var/www/html/
+fi
+
 sudo chown -R www-data:www-data /var/www/html
 sudo chmod -R 755 /var/www/html
+echo "   Verificando arquivos atualizados..."
+if [ -f "/var/www/html/index.html" ]; then
+    echo "   ✅ index.html encontrado"
+    echo "   Primeiras linhas do index.html:"
+    head -3 /var/www/html/index.html
+else
+    echo "   ⚠️ AVISO: index.html não encontrado!"
+    echo "   Conteúdo de /var/www/html:"
+    ls -la /var/www/html/ | head -10
+fi
 echo "✅ Frontend atualizado"
 
 # 5. Reiniciar containers
@@ -68,6 +95,11 @@ fi
 echo ""
 echo "6. Aguardando inicialização..."
 sleep 15
+
+# 6.5. Forçar reload do nginx (limpar cache interno)
+echo ""
+echo "6.5. Forçando reload do nginx..."
+sudo docker exec geo7-web nginx -s reload 2>/dev/null || echo "   (Nginx já atualizado)"
 
 # 7. Verificar status dos containers
 echo ""
@@ -120,3 +152,8 @@ echo ""
 echo "Para monitorar:"
 echo "  sudo docker ps"
 echo "  curl http://localhost:8080/api/healthz"
+echo ""
+echo "⚠️ IMPORTANTE - Limpar cache do navegador:"
+echo "  - Chrome/Edge: Ctrl+Shift+R (Windows) ou Cmd+Shift+R (Mac)"
+echo "  - Firefox: Ctrl+F5 (Windows) ou Cmd+Shift+R (Mac)"
+echo "  - Ou abrir em modo anônimo/privado"

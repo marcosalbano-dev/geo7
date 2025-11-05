@@ -9,6 +9,30 @@ Este guia te permite atualizar todo o sistema (Frontend + Backend + Docker + EC2
 - ✅ Node.js instalado localmente
 - ✅ Maven instalado localmente
 - ✅ Git configurado
+- ✅ **OpenSSH Client instalado no Windows** (para usar `scp` e `ssh`)
+
+### **Instalar OpenSSH no Windows (se necessário):**
+
+Se você receber erro "scp não é reconhecido", instale o OpenSSH:
+
+1. **Opção 1: Via PowerShell (Recomendado)**
+   ```powershell
+   # Abra PowerShell como Administrador e execute:
+   Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+   ```
+
+2. **Opção 2: Via Configurações do Windows**
+   - Abra **Configurações** > **Aplicativos** > **Recursos Opcionais**
+   - Clique em **Adicionar um recurso**
+   - Procure por **OpenSSH Client**
+   - Clique em **Instalar**
+
+3. **Verificar instalação:**
+   ```powershell
+   # No PowerShell, execute:
+   Get-Command scp
+   # Deve mostrar: C:\Windows\System32\OpenSSH\scp.exe
+   ```
 
 ---
 
@@ -33,14 +57,26 @@ ls target/geo7-1.0-SNAPSHOT.jar
 # 1. Navegar para o diretório do frontend
 cd C:\Users\marco\OneDrive\Documentos\projeto-geo7\geo7-app
 
-# 2. Instalar dependências (se necessário)
+# 2. Garantir que está no branch correto
+git checkout feat_campos_obrigatorios_front
+git pull origin feat_campos_obrigatorios_front
+
+# 3. Instalar dependências (se necessário)
 npm install
 
-# 3. Compilar para produção
+# 4. Limpar build anterior
+rm -rf dist/
+
+# 5. Compilar para produção
 npm run build
 
-# 4. Verificar se os arquivos foram gerados
-ls dist/geo7-app/
+# 6. Verificar se os arquivos foram gerados
+# O Angular gera em dist/geo7-app/browser/
+ls dist/geo7-app/browser/
+ls dist/geo7-app/browser/index.html
+
+# 7. Verificar data de modificação dos arquivos
+# (Os arquivos devem ter data/hora recente)
 ```
 
 ### **PASSO 3: Preparar Arquivos para Upload**
@@ -53,7 +89,12 @@ mkdir C:\temp\geo7-update
 copy target\geo7-1.0-SNAPSHOT.jar C:\temp\geo7-update\
 
 # 3. Copiar arquivos do frontend
-xcopy dist\geo7-app\* C:\temp\geo7-update\frontend\ /E /I
+# IMPORTANTE: O Angular gera em dist/geo7-app/browser/
+# Copiamos o conteúdo de browser/ para frontend/
+xcopy dist\geo7-app\browser\* C:\temp\geo7-update\frontend\ /E /I /Y
+
+# 4. Verificar se o index.html foi copiado
+dir C:\temp\geo7-update\frontend\index.html
 ```
 
 ### **PASSO 4: Upload para EC2**
@@ -78,17 +119,41 @@ sudo docker-compose down
 # 3. Atualizar JAR do backend
 sudo cp geo7-1.0-SNAPSHOT.jar /opt/geo7/
 
-# 4. Atualizar frontend
+# 4. Atualizar frontend (FORÇAR atualização completa)
 sudo rm -rf /var/www/html/*
-sudo cp -r frontend/* /var/www/html/
 
-# 5. Reiniciar containers
+# Detectar estrutura (Angular pode gerar em frontend/browser/)
+if [ -f "frontend/browser/index.html" ]; then
+    # Estrutura Angular com subdiretório browser/
+    sudo cp -r frontend/browser/* /var/www/html/
+else
+    # Estrutura padrão
+    sudo cp -r frontend/* /var/www/html/
+fi
+
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+
+# 5. Verificar arquivos atualizados
+ls -la /var/www/html/index.html
+head -5 /var/www/html/index.html
+
+# 6. Reiniciar containers (força reload do nginx)
 sudo docker-compose up -d
 
-# 6. Verificar se está funcionando
+# 7. Aguardar inicialização
+sleep 10
+
+# 8. Verificar se está funcionando
 sudo docker ps
 curl http://localhost:8080/api/healthz
+
+# 9. Limpar cache do navegador (instruir usuário a fazer Ctrl+Shift+R)
 ```
+
+**⚠️ IMPORTANTE:** Após atualizar, o usuário deve limpar o cache do navegador:
+- **Chrome/Edge:** `Ctrl+Shift+R` (Windows) ou `Cmd+Shift+R` (Mac)
+- **Firefox:** `Ctrl+F5` (Windows) ou `Cmd+Shift+R` (Mac)
 
 ---
 
@@ -130,8 +195,28 @@ if ($LASTEXITCODE -eq 0) {
 Write-Host "`n3. Preparando arquivos..." -ForegroundColor Yellow
 Remove-Item -Path "C:\temp\geo7-update" -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -Path "C:\temp\geo7-update" -ItemType Directory -Force
+New-Item -Path "C:\temp\geo7-update\frontend" -ItemType Directory -Force
+
+# Copiar JAR
 Copy-Item "target\geo7-1.0-SNAPSHOT.jar" "C:\temp\geo7-update\"
-Copy-Item "dist\geo7-app\*" "C:\temp\geo7-update\frontend\" -Recurse -Force
+
+# Copiar frontend (IMPORTANTE: do diretório browser/)
+if (Test-Path "dist\geo7-app\browser") {
+    Copy-Item "dist\geo7-app\browser\*" "C:\temp\geo7-update\frontend\" -Recurse -Force
+    Write-Host "✅ Frontend copiado de dist/geo7-app/browser/" -ForegroundColor Green
+} else {
+    # Fallback
+    Copy-Item "dist\geo7-app\*" "C:\temp\geo7-update\frontend\" -Recurse -Force
+    Write-Host "⚠️ Copiado de dist/geo7-app/ (browser/ não encontrado)" -ForegroundColor Yellow
+}
+
+# Verificar se index.html foi copiado
+if (Test-Path "C:\temp\geo7-update\frontend\index.html") {
+    Write-Host "✅ index.html encontrado no diretório de upload" -ForegroundColor Green
+} else {
+    Write-Host "❌ ERRO: index.html não encontrado!" -ForegroundColor Red
+    exit 1
+}
 
 Write-Host "✅ Arquivos preparados em C:\temp\geo7-update" -ForegroundColor Green
 Write-Host "`nPróximo passo: Execute o script de upload para EC2" -ForegroundColor Cyan
@@ -379,11 +464,42 @@ http {
    sudo docker logs geo7-web
    ```
 
-4. **Frontend não carrega:**
+4. **Frontend não atualiza (problema de cache):**
+   ```bash
+   # Na EC2, executar script de atualização forçada
+   chmod +x forcar-atualizacao-frontend.sh
+   ./forcar-atualizacao-frontend.sh
+   
+   # OU fazer manualmente:
+   sudo docker-compose down
+   sudo rm -rf /var/www/html/*
+   sudo cp -r frontend/* /var/www/html/
+   sudo docker-compose up -d
+   sudo docker exec geo7-web nginx -s reload
+   ```
+   
+   **No navegador:**
+   - Limpar cache: `Ctrl+Shift+R` (Windows) ou `Cmd+Shift+R` (Mac)
+   - Ou abrir em modo anônimo/privado
+
+5. **Endpoints retornando 401 (não autorizado):**
+   ```bash
+   # Verificar se o token JWT está sendo enviado
+   # Fazer login novamente no frontend
+   # Verificar logs do backend:
+   sudo docker logs geo7-app | grep -i "401\|unauthorized"
+   ```
+   
+   **Solução:** Fazer logout e login novamente no frontend para obter novo token JWT.
+
+6. **Frontend não carrega:**
    ```bash
    # Verificar nginx
-   sudo nginx -t
-   sudo systemctl restart nginx
+   sudo docker exec geo7-web nginx -t
+   sudo docker exec geo7-web nginx -s reload
+   
+   # Verificar arquivos
+   ls -la /var/www/html/
    ```
 
 ---
