@@ -75,8 +75,8 @@ if (!(Test-Path "$FrontendPath\node_modules")) {
 }
 
 # Compilar
-Write-Host "   Compilando frontend..." -ForegroundColor Gray
-npm run build
+Write-Host "   Compilando frontend (produção)..." -ForegroundColor Gray
+npm run build:prod
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "   ✅ Frontend compilado com sucesso" -ForegroundColor Green

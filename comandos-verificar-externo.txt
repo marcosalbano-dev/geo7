@@ -1,0 +1,45 @@
+# COMANDOS PARA VERIFICAR ACESSO EXTERNO NA EC2
+# Copie e cole estes comandos diretamente no terminal SSH
+
+# 1. Verificar IP público
+echo "=== INFORMAÇÕES DE REDE ==="
+PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+echo "IP Público: $PUBLIC_IP"
+echo ""
+
+# 2. Testar acesso local
+echo "=== TESTE LOCAL ==="
+echo "HTTP local:"
+curl -s -o /dev/null -w "Status: %{http_code}\n" http://localhost/
+echo "API local:"
+curl -s -o /dev/null -w "Status: %{http_code}\n" http://localhost/api/healthz
+echo ""
+
+# 3. Testar acesso externo
+echo "=== TESTE EXTERNO ==="
+if [ -n "$PUBLIC_IP" ]; then
+    echo "Testando http://$PUBLIC_IP/"
+    curl -s -o /dev/null -w "Status: %{http_code}\n" --max-time 5 http://$PUBLIC_IP/ || echo "TIMEOUT ou ERRO"
+    echo ""
+    echo "Testando http://$PUBLIC_IP/api/healthz"
+    curl -s -o /dev/null -w "Status: %{http_code}\n" --max-time 5 http://$PUBLIC_IP/api/healthz || echo "TIMEOUT ou ERRO"
+    echo ""
+    echo "Se retornar TIMEOUT, o problema é Security Groups da AWS"
+fi
+
+# 4. Verificar firewall
+echo "=== FIREWALL ==="
+if command -v ufw >/dev/null 2>&1; then
+    echo "Status UFW:"
+    sudo ufw status
+fi
+
+echo ""
+echo "=== PRÓXIMOS PASSOS ==="
+echo "Se o acesso externo não funcionar:"
+echo "1. Acesse: https://console.aws.amazon.com/ec2/"
+echo "2. Vá em Instances -> Sua instância -> Security -> Security Group"
+echo "3. Adicione regras Inbound:"
+echo "   - HTTP (porta 80) de 0.0.0.0/0"
+echo "   - HTTPS (porta 443) de 0.0.0.0/0"
+

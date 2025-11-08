@@ -1,0 +1,32 @@
+# COMANDOS PARA TESTAR API NA EC2
+# Execute estes comandos para diagnosticar o problema
+
+# 1. Testar backend diretamente
+echo "=== TESTE 1: Backend direto ==="
+curl http://localhost:8080/api/healthz
+echo ""
+
+# 2. Testar via proxy
+echo "=== TESTE 2: Via proxy nginx ==="
+curl http://localhost/api/healthz
+echo ""
+
+# 3. Verificar configuração do nginx
+echo "=== TESTE 3: Configuração nginx ==="
+sudo docker exec geo7-web cat /etc/nginx/conf.d/default.conf | grep -A 5 "location /api/"
+echo ""
+
+# 4. Verificar se containers estão na mesma rede
+echo "=== TESTE 4: Rede Docker ==="
+sudo docker network inspect ubuntu_geo7-network | grep -A 5 "Containers"
+echo ""
+
+# 5. Testar conectividade entre containers
+echo "=== TESTE 5: Conectividade ==="
+sudo docker exec geo7-web wget -O- http://app:8080/api/healthz 2>/dev/null || echo "ERRO: Não conseguiu conectar ao app:8080"
+echo ""
+
+# 6. Verificar logs do nginx
+echo "=== TESTE 6: Logs nginx ==="
+sudo docker logs geo7-web --tail 10 | grep -E "(GET|POST|error)"
+

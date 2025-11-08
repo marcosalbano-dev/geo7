@@ -116,6 +116,26 @@ if (Test-Path $frontendDir) {
     exit 1
 }
 
+# 3. Upload do script atualizar-ec2.sh atualizado
+Write-Host "`n4. Enviando script atualizar-ec2.sh atualizado..." -ForegroundColor Yellow
+$scriptPath = "C:\Users\marco\OneDrive\Documentos\projeto-geo7\geo7\atualizar-ec2.sh"
+if (Test-Path $scriptPath) {
+    Write-Host "   Enviando script..." -ForegroundColor Cyan
+    & $scpPath -i $keyPath $scriptPath "${ec2Host}:/home/ubuntu/"
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ Script enviado com sucesso" -ForegroundColor Green
+        
+        # Tornar executável
+        Write-Host "   Tornando script executável..." -ForegroundColor Gray
+        ssh -i $keyPath $ec2Host "chmod +x atualizar-ec2.sh" 2>&1 | Out-Null
+    } else {
+        Write-Host "⚠️ Aviso: Erro no upload do script (pode já existir na EC2)" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "⚠️ Script atualizar-ec2.sh não encontrado localmente" -ForegroundColor Yellow
+}
+
 Write-Host "`n✅ UPLOAD CONCLUÍDO COM SUCESSO!" -ForegroundColor Green
 Write-Host "`nPróximo passo: Execute o script de atualização na EC2" -ForegroundColor Yellow
 Write-Host "`nComando SSH:" -ForegroundColor Cyan

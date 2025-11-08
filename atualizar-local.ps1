@@ -24,8 +24,8 @@ Set-Location "C:\Users\marco\OneDrive\Documentos\projeto-geo7\geo7-app"
 Write-Host "   Instalando dependências..." -ForegroundColor Cyan
 npm install --silent
 
-Write-Host "   Compilando aplicação Angular..." -ForegroundColor Cyan
-npm run build
+Write-Host "   Compilando aplicação Angular (produção)..." -ForegroundColor Cyan
+npm run build:prod
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "✅ Frontend compilado com sucesso" -ForegroundColor Green

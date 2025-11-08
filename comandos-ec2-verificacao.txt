@@ -1,0 +1,119 @@
+# COMANDOS PARA EXECUTAR NA EC2
+# Copie e cole estes comandos diretamente no terminal SSH da EC2
+
+# ============================================
+# 1. VERIFICAR CONFIGURAÇÃO ATUAL
+# ============================================
+
+echo "=== VERIFICANDO CONFIGURAÇÃO ==="
+
+# Verificar docker-compose.yml
+echo "1. Verificando docker-compose.yml..."
+if [ -f "docker-compose.yml" ]; then
+    echo "   ✅ docker-compose.yml encontrado"
+    cat docker-compose.yml | grep -A 10 "web:"
+else
+    echo "   ❌ docker-compose.yml não encontrado"
+    find ~ -name "docker-compose.yml" -type f 2>/dev/null | head -3
+fi
+
+# Verificar nginx.conf no container
+echo ""
+echo "2. Verificando nginx.conf no container..."
+sudo docker exec geo7-web cat /etc/nginx/conf.d/default.conf 2>/dev/null | grep -A 5 "location /api/"
+
+# Verificar build do frontend
+echo ""
+echo "3. Verificando build do frontend..."
+MAIN_JS=$(find /var/www/html -name "main*.js" -type f 2>/dev/null | head -1)
+if [ -n "$MAIN_JS" ]; then
+    echo "   Arquivo: $MAIN_JS"
+    if grep -q "https://18-228-94-6.sslip.io" "$MAIN_JS" 2>/dev/null; then
+        echo "   ❌ PROBLEMA: Build contém URLs absolutas HTTPS!"
+    else
+        echo "   ✅ Build parece correto (sem URLs absolutas HTTPS)"
+    fi
+fi
+
+# Testar proxy
+echo ""
+echo "4. Testando proxy..."
+curl -s -o /dev/null -w "   Status: %{http_code}\n" http://localhost/api/healthz
+
+echo ""
+echo "=== VERIFICAÇÃO CONCLUÍDA ==="
+
+# ============================================
+# 2. CORRIGIR NGINX.CONF (se necessário)
+# ============================================
+
+echo ""
+echo "=== CORRIGINDO NGINX.CONF ==="
+
+# Criar nginx.conf correto
+cat > /tmp/nginx.conf << 'EOF'
+server {
+  listen 80;
+  server_name _;
+
+  root /usr/share/nginx/html;
+  index index.html;
+
+  # estáticos
+  location ~* \.(?:js|css|png|jpg|jpeg|gif|svg|ico|woff2?)$ {
+    try_files $uri =404;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    access_log off;
+  }
+
+  # SPA
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+
+  # API - Proxy correto
+  location /api/ {
+    proxy_pass http://app:8080/api/;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_buffering off;
+    proxy_redirect off;
+  }
+}
+EOF
+
+# Copiar para o container
+echo "Copiando nginx.conf para o container..."
+sudo docker cp /tmp/nginx.conf geo7-web:/etc/nginx/conf.d/default.conf
+
+# Recarregar nginx
+echo "Recarregando nginx..."
+sudo docker exec geo7-web nginx -s reload
+
+# Verificar se foi aplicado
+echo ""
+echo "Verificando configuração aplicada:"
+sudo docker exec geo7-web cat /etc/nginx/conf.d/default.conf | grep -A 3 "location /api/"
+
+echo ""
+echo "✅ Correção concluída!"
+
+# ============================================
+# 3. TESTAR APÓS CORREÇÃO
+# ============================================
+
+echo ""
+echo "=== TESTANDO APÓS CORREÇÃO ==="
+curl -s http://localhost/api/healthz | head -1
+echo ""
+
+echo "✅ Teste concluído!"
+echo ""
+echo "Agora teste no navegador:"
+echo "  http://18-228-94-6.sslip.io/login"
+echo ""
+echo "⚠️ IMPORTANTE: Limpe o cache do navegador (Ctrl+Shift+R)"
+

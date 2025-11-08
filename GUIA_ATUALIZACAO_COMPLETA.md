@@ -492,7 +492,19 @@ http {
    
    **Solução:** Fazer logout e login novamente no frontend para obter novo token JWT.
 
-6. **Frontend não carrega:**
+6. **Frontend não atualiza mesmo após atualização (cache do navegador):**
+   ```bash
+   # Na EC2, corrigir cache do nginx
+   chmod +x fix-nginx-cache.sh
+   ./fix-nginx-cache.sh
+   ```
+   
+   **No navegador:**
+   - Limpar cache: `Ctrl+Shift+R` (Windows) ou `Cmd+Shift+R` (Mac)
+   - Ou abrir em modo anônimo/privado
+   - Ou limpar cache completamente nas configurações do navegador
+
+7. **Frontend não carrega:**
    ```bash
    # Verificar nginx
    sudo docker exec geo7-web nginx -t
@@ -500,6 +512,10 @@ http {
    
    # Verificar arquivos
    ls -la /var/www/html/
+   
+   # Debug completo
+   chmod +x debug-frontend.sh
+   ./debug-frontend.sh
    ```
 
 ---

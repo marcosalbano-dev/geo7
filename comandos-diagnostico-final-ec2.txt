@@ -1,0 +1,31 @@
+# COMANDOS PARA DIAGNÓSTICO FINAL NA EC2
+
+# 1. Verificar requisições recentes
+echo "=== REQUISIÇÕES RECENTES ==="
+sudo docker logs geo7-web --tail 50 | grep -E "(POST|GET|OPTIONS)" | tail -10
+echo ""
+
+# 2. Verificar requisições para /api/auth/login especificamente
+echo "=== REQUISIÇÕES /api/auth/login ==="
+sudo docker logs geo7-web --tail 200 | grep "/api/auth/login"
+echo ""
+
+# 3. Testar acesso externo
+echo "=== TESTE EXTERNO ==="
+PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+echo "IP: $PUBLIC_IP"
+echo "Testando POST externo:"
+curl -v -X POST http://$PUBLIC_IP/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@test.com","password":"test"}' 2>&1 | grep -E "(< HTTP|Connection|refused)" | head -5
+echo ""
+
+# 4. Verificar portas
+echo "=== PORTAS DO CONTAINER ==="
+sudo docker port geo7-web
+echo ""
+
+# 5. Monitorar logs em tempo real (execute e tente fazer login no navegador)
+echo "=== MONITORANDO LOGS (tente fazer login agora) ==="
+sudo docker logs geo7-web --tail 0 -f
+
